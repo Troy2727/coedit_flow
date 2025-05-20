@@ -8,11 +8,10 @@
     <img src="https://img.shields.io/badge/-TypeScript-black?style=for-the-badge&logoColor=white&logo=typescript&color=3178C6" alt="typescript" />
     <img src="https://img.shields.io/badge/-Tailwind_CSS-black?style=for-the-badge&logoColor=white&logo=tailwindcss&color=06B6D4" alt="tailwindcss" />
   </p>
-  <h1 align="center">CoEdit Flow</h1>
+  <h1 align="center">Live Docs Application</h1>
   <p align="center">📄 Real-Time Collaborative Document Editor</p>
   <p align="center">
-    CoEdit Flow is a real-time collaborative document editor inspired by Google Docs, built using modern web technologies to showcase advanced frontend and backend integration.<br />
-    This project demonstrates proficiency in building scalable, real-time applications with a focus on user experience and performance.
+     Live Docs Application is a full-featured, real-time collaborative document editor inspired by Google Docs. Built with modern web technologies, it enables multiple users to edit documents simultaneously while showcasing seamless frontend–backend integration. The platform includes live cursors, inline commenting, role-based permissions, and version history — all supported by a scalable real-time infrastructure. This project demonstrates advanced knowledge of state synchronization, WebSockets, access control, and conflict resolution, with a strong focus on performance and user experience.
   </p>
 </div>
 
@@ -33,7 +32,7 @@
 
 ## 🤖 Introduction
 
-CoEdit Flow was created to demonstrate the power of building real-time collaborative applications with a modern tech stack. It simulates a simplified version of Google Docs, where multiple users can:
+The Live Docs Application was created to demonstrate the power of building real-time collaborative applications with a modern tech stack. It simulates a simplified version of Google Docs, where multiple users can:
 
 - Collaborate on documents in real-time
 - View active participants
@@ -135,7 +134,7 @@ Make sure you have the following installed on your machine:
 
 ```bash
 git clone https://github.com/Troy2727/coedit_flow.git
-cd CoEdit-Flow
+cd coedit_flow
 ```
 
 ### **Installation**
@@ -321,7 +320,7 @@ declare type UserType = "creator" | "editor" | "viewer";
 
 💡 **Bonus Tip: Visualizing the Stack**
 
-Many developers include a diagram like this to give a clearer understanding of the application's architecture and flow. This is what it looks like for CoEdit Flow:
+Many developers include a diagram like this to give a clearer understanding of the application's architecture and flow. This is what it looks like for the Live Docs Application:
 
 ```
 ┌──────────────────────────────────────────────┐
