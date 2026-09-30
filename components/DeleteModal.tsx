@@ -65,8 +65,8 @@ export const DeleteModal = ({ roomId }: DeleteModalProps) => {
         </DialogHeader>
 
         <DialogFooter className="mt-5">
-          <DialogClose asChild className="w-full bg-dark-400 text-white">
-            Cancel
+          <DialogClose asChild>
+            <Button className="w-full bg-dark-400 text-white">Cancel</Button>
           </DialogClose>
 
           <Button
