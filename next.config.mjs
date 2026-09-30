@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // E2E tests build into their own folder so they don't clobber a running `next dev`
+  distDir: process.env.NEXT_DIST_DIR || '.next',
   typescript: {
     ignoreBuildErrors: true,
   },

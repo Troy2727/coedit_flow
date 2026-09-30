@@ -39,12 +39,38 @@ export { expect };
 
 export const editorOf = (page: Page) => page.locator('.editor-input');
 
+/**
+ * Waits for the editor after opening a document. Loading the room from Liveblocks'
+ * servers occasionally takes longer than the default 15s assertion timeout.
+ */
+export async function waitForEditor(page: Page) {
+  await expect(editorOf(page)).toBeVisible({ timeout: 45_000 });
+}
+
+/**
+ * Waits until Lexical (not just the browser) has selected exactly `text`.
+ * Lexical picks up selection changes asynchronously, so a shortcut pressed right
+ * after selecting could otherwise apply to an empty caret.
+ */
+export async function waitForSelection(page: Page, text: string) {
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        // Lexical stores the editor instance on its root element
+        const editor = (document.querySelector('.editor-input') as any)?.__lexicalEditor;
+        const state = editor?.getEditorState();
+        return state?.read(() => state._selection?.getTextContent() ?? null) ?? null;
+      }),
+    )
+    .toBe(text);
+}
+
 /** Creates a blank document from the home page and waits for the editor. Returns the room id. */
 export async function createDocument(page: Page) {
   await page.goto('/');
   await page.getByRole('button', { name: /start a blank document/i }).click();
   await page.waitForURL(/\/documents\/[^/]+$/);
-  await expect(editorOf(page)).toBeVisible();
+  await waitForEditor(page);
 
   return page.url().split('/documents/')[1];
 }

@@ -212,8 +212,10 @@ export const createVersionSnapshot = async (roomId: string) => {
     const snapshot = await liveblocks.createVersionHistorySnapshot(roomId);
 
     // Liveblocks can answer 204 "Could not create version" (e.g. edits not persisted yet)
-    // without throwing, so only a returned version id counts as success.
-    if(!snapshot?.data?.id) throw new Error(`No version created: ${JSON.stringify(snapshot)}`);
+    // without throwing, so only a returned version id counts as success. The SDK types
+    // say { data: { id } } but the API returns { id }, so accept both.
+    const versionId = snapshot?.data?.id ?? (snapshot as unknown as { id?: string })?.id;
+    if(!versionId) throw new Error(`No version created: ${JSON.stringify(snapshot)}`);
 
     return parseStringify(snapshot);
   } catch (error) {
