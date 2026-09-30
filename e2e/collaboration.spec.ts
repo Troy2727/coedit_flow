@@ -1,0 +1,122 @@
+import type { Page } from '@playwright/test';
+
+import { createDocument, editorOf, expect, openAs, test } from './helpers';
+import { GUEST, OWNER } from './test-users';
+
+test.use({ user: OWNER });
+
+async function invite(page: Page, email: string, role: 'can view' | 'can edit') {
+  await page.getByRole('button', { name: /share/i }).first().click();
+  const dialog = page.getByRole('dialog');
+
+  await dialog.getByLabel('Email address').fill(email);
+  if (role === 'can edit') {
+    await dialog.getByRole('combobox').first().click();
+    await page.getByRole('option', { name: 'can edit' }).click();
+  }
+  await dialog.getByRole('button', { name: 'Invite' }).click();
+  await expect(dialog.getByText(email)).toBeVisible();
+
+  await page.keyboard.press('Escape');
+}
+
+// Option label -> description shown once the server has saved it
+const GENERAL_ACCESS = {
+  'Restricted': 'Only people with access can open with the link',
+  'Anyone with the link can view': 'Anyone signed in with the link can view',
+} as const;
+
+async function setGeneralAccess(page: Page, option: keyof typeof GENERAL_ACCESS) {
+  await page.getByRole('button', { name: /share/i }).first().click();
+  const dialog = page.getByRole('dialog');
+
+  await dialog.getByRole('combobox').last().click();
+  await page.getByRole('option', { name: option }).click();
+  await expect(dialog.getByText(GENERAL_ACCESS[option])).toBeVisible();
+
+  await page.keyboard.press('Escape');
+}
+
+test('two editors see each other’s changes and presence in real time', async ({ page, browser }) => {
+  const roomId = await createDocument(page);
+  await invite(page, GUEST.email, 'can edit');
+
+  const guest = await openAs(browser, GUEST);
+  await guest.page.goto(`/documents/${roomId}`);
+  await expect(editorOf(guest.page)).toBeVisible();
+
+  // Presence: each sees the other's avatar
+  await expect(page.getByAltText(`${GUEST.firstName} ${GUEST.lastName}`)).toBeVisible();
+  await expect(guest.page.getByAltText(`${OWNER.firstName} ${OWNER.lastName}`)).toBeVisible();
+
+  await editorOf(page).click();
+  await page.keyboard.type('Hello from Olivia.');
+  await expect(editorOf(guest.page)).toContainText('Hello from Olivia.');
+
+  await editorOf(guest.page).click();
+  await guest.page.keyboard.press('Control+End');
+  await guest.page.keyboard.type(' Hi from Gabe!');
+  await expect(editorOf(page)).toContainText('Hello from Olivia. Hi from Gabe!');
+
+  await guest.context.close();
+});
+
+test('invited viewers get a read-only document', async ({ page, browser }) => {
+  const roomId = await createDocument(page);
+  await invite(page, GUEST.email, 'can view');
+
+  const guest = await openAs(browser, GUEST);
+  await guest.page.goto(`/documents/${roomId}`);
+
+  await expect(guest.page.getByText('View only')).toBeVisible();
+  await expect(editorOf(guest.page)).toHaveAttribute('contenteditable', 'false');
+  await expect(guest.page.getByRole('button', { name: 'Version history' })).toHaveCount(0);
+  await expect(guest.page.getByAltText('delete')).toHaveCount(0);
+
+  await guest.context.close();
+});
+
+test('"anyone with the link" sharing grants and revokes access', async ({ page, browser }) => {
+  const roomId = await createDocument(page);
+  await setGeneralAccess(page, 'Anyone with the link can view');
+
+  const guest = await openAs(browser, GUEST);
+  await guest.page.goto(`/documents/${roomId}`);
+  await expect(guest.page.getByText('View only')).toBeVisible();
+
+  await setGeneralAccess(page, 'Restricted');
+  await guest.page.goto(`/documents/${roomId}`);
+  await expect(guest.page).toHaveURL(/\/$/);
+
+  await guest.context.close();
+});
+
+test('version history saves, previews, and restores a version', async ({ page }) => {
+  await createDocument(page);
+  const editor = editorOf(page);
+
+  await editor.click();
+  await page.keyboard.type('Version one text');
+
+  await page.getByRole('button', { name: 'Version history' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Version history' });
+
+  // Liveblocks snapshots lag live edits by a few seconds and the UI then asks
+  // to "try again in a few seconds", so retry the way a user would.
+  await expect(async () => {
+    await dialog.getByRole('button', { name: 'Save current version' }).click();
+    await expect(dialog.getByText('Version one text').first()).toBeVisible({ timeout: 3_000 });
+  }).toPass({ timeout: 60_000, intervals: [2_000, 3_000, 5_000] });
+  await page.keyboard.press('Escape');
+
+  await editor.click();
+  await page.keyboard.press('Control+End');
+  await page.keyboard.type(' plus later edits');
+  await expect(editor).toContainText('Version one text plus later edits');
+
+  await page.getByRole('button', { name: 'Version history' }).click();
+  await dialog.getByRole('button', { name: /restore/i }).click();
+
+  await expect(dialog).toBeHidden();
+  await expect(editor).toHaveText('Version one text');
+});
