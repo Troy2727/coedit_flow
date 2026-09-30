@@ -19,9 +19,12 @@ const assertRoomPermission = async (roomId: string, level: 'editor' | 'creator')
   const email = await getCurrentUserEmail();
   const room = await liveblocks.getRoom(roomId);
 
+  // Invited users get their own access; everyone else falls back to link sharing (defaultAccesses)
+  const access = (room.usersAccesses[email] ?? room.defaultAccesses) as string[];
+
   const allowed = level === 'creator'
     ? room.metadata.email === email
-    : (room.usersAccesses[email] as string[] | undefined)?.includes('room:write');
+    : access.includes('room:write');
 
   if(!allowed) throw new Error('You do not have permission to do this');
 
@@ -69,7 +72,7 @@ export const getDocument = async ({ roomId, userId }: { roomId: string; userId: 
 
       const room = await liveblocks.getRoom(roomId);
 
-      const hasAccess = Object.keys(room.usersAccesses).includes(userId);
+      const hasAccess = Object.keys(room.usersAccesses).includes(userId) || room.defaultAccesses.length > 0;
     
       if(!hasAccess) {
         throw new Error('You do not have access to this document');
@@ -172,6 +175,21 @@ export const removeCollaborator = async ({ roomId, email }: {roomId: string, ema
     return parseStringify(updatedRoom);
   } catch (error) {
     console.log(`Error happened while removing a collaborator: ${error}`);
+  }
+}
+
+export const updateGeneralAccess = async (roomId: string, generalAccess: GeneralAccess) => {
+  try {
+    await assertRoomPermission(roomId, 'editor');
+
+    const room = await liveblocks.updateRoom(roomId, {
+      defaultAccesses: generalAccess === 'restricted' ? [] : getAccessType(generalAccess) as AccessType,
+    });
+
+    revalidatePath(`/documents/${roomId}`);
+    return parseStringify(room);
+  } catch (error) {
+    console.log(`Error happened while updating general access: ${error}`);
   }
 }
 
