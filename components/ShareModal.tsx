@@ -19,8 +19,9 @@ import { Input } from "./ui/input";
 import UserTypeSelector from "./UserTypeSelector";
 import Collaborator from "./Collaborator";
 import { updateDocumentAccess } from "@/lib/actions/room.actions";
+import GeneralAccessSection from "./GeneralAccess";
 
-const ShareModal = ({ roomId, collaborators, creatorId, currentUserType }: ShareDocumentDialogProps) => {
+const ShareModal = ({ roomId, collaborators, creatorId, currentUserType, generalAccess }: ShareDocumentDialogProps) => {
   const user = useSelf();
 
   const [open, setOpen] = useState(false);
@@ -100,6 +101,12 @@ const ShareModal = ({ roomId, collaborators, creatorId, currentUserType }: Share
             ))}
           </ul>
         </div>
+
+        <GeneralAccessSection
+          roomId={roomId}
+          initialAccess={generalAccess}
+          canChange={currentUserType === 'editor'}
+        />
       </DialogContent>
     </Dialog>
   )

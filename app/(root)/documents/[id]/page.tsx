@@ -25,7 +25,13 @@ const Document = async ({ params: { id } }: SearchParamProps) => {
       : 'viewer'
   }))
 
-  const currentUserType = room.usersAccesses[clerkUser.emailAddresses[0].emailAddress]?.includes('room:write') ? 'editor' : 'viewer';
+  // Invited users get their own access; everyone else falls back to link sharing (defaultAccesses)
+  const currentUserAccess = room.usersAccesses[clerkUser.emailAddresses[0].emailAddress] ?? room.defaultAccesses;
+  const currentUserType = currentUserAccess.includes('room:write') ? 'editor' : 'viewer';
+
+  const generalAccess: GeneralAccess = room.defaultAccesses.length === 0
+    ? 'restricted'
+    : room.defaultAccesses.includes('room:write') ? 'editor' : 'viewer';
 
   return (
     <main className="flex w-full flex-col items-center">
@@ -34,6 +40,7 @@ const Document = async ({ params: { id } }: SearchParamProps) => {
         roomMetadata={room.metadata}
         users={usersData}
         currentUserType={currentUserType}
+        generalAccess={generalAccess}
       />
     </main>
   )

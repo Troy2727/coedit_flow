@@ -32,7 +32,9 @@ export const getDocumentUsers = async ({ roomId, currentUser, text }: { roomId: 
     const clerkUser = await getSignedInUser();
     const room = await liveblocks.getRoom(roomId);
 
-    if(!clerkUser || !room.usersAccesses[clerkUser.emailAddresses[0].emailAddress]) {
+    const hasAccess = clerkUser && (room.usersAccesses[clerkUser.emailAddresses[0].emailAddress] || room.defaultAccesses.length > 0);
+
+    if(!hasAccess) {
       throw new Error('You do not have access to this document');
     }
 
