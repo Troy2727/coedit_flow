@@ -1,11 +1,11 @@
 'use client';
 
-import { useHistoryVersions } from '@liveblocks/react';
+import type { HistoryVersion } from '@liveblocks/client';
 import { HistoryVersionPreview } from '@liveblocks/react-lexical';
 import { HistoryVersionSummary, HistoryVersionSummaryList } from '@liveblocks/react-ui';
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { createVersionSnapshot } from '@/lib/actions/room.actions';
+import { createVersionSnapshot, getDocumentVersions } from '@/lib/actions/room.actions';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/dialog';
 import { Button } from './ui/button';
 
@@ -17,10 +17,31 @@ type VersionHistoryProps = {
 
 // Must render inside <LiveblocksPlugin>, which HistoryVersionPreview depends on.
 const VersionHistory = ({ roomId, open, onOpenChange }: VersionHistoryProps) => {
-  const { versions, isLoading, error } = useHistoryVersions();
+  // Loaded through a server action rather than useHistoryVersions: that hook
+  // only re-polls every minute, so a just-saved version wouldn't show up.
+  const [versions, setVersions] = useState<HistoryVersion[]>();
+  const [error, setError] = useState(false);
   const [selectedVersionId, setSelectedVersionId] = useState<string>();
   const [saving, setSaving] = useState(false);
   const [saveFailed, setSaveFailed] = useState(false);
+
+  const isLoading = versions === undefined && !error;
+
+  const loadVersions = useCallback(async () => {
+    const data: HistoryVersion[] | undefined = await getDocumentVersions(roomId);
+    if (!data) return setError(true);
+
+    setError(false);
+    setVersions(
+      data
+        .map((version) => ({ ...version, createdAt: new Date(version.createdAt) }))
+        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()),
+    );
+  }, [roomId]);
+
+  useEffect(() => {
+    if (open) loadVersions();
+  }, [open, loadVersions]);
 
   const selectedVersion = useMemo(
     () => versions?.find((version) => version.id === selectedVersionId) ?? versions?.[0],
@@ -32,7 +53,12 @@ const VersionHistory = ({ roomId, open, onOpenChange }: VersionHistoryProps) => 
     setSaveFailed(false);
 
     const snapshot = await createVersionSnapshot(roomId);
-    if (!snapshot) setSaveFailed(true);
+    if (snapshot) {
+      await loadVersions();
+      setSelectedVersionId(undefined); // show the newest version
+    } else {
+      setSaveFailed(true);
+    }
 
     setSaving(false);
   };
@@ -51,7 +77,11 @@ const VersionHistory = ({ roomId, open, onOpenChange }: VersionHistoryProps) => 
             {saving ? 'Saving...' : 'Save current version'}
           </Button>
         </DialogHeader>
-        {saveFailed && <p className="text-sm text-red-400">Couldn&apos;t save a version. Please try again.</p>}
+        {saveFailed && (
+          <p className="text-sm text-red-400">
+            Couldn&apos;t save a version yet. Recent edits may still be syncing, so try again in a few seconds.
+          </p>
+        )}
 
         {isLoading ? (
           <p className="text-blue-100">Loading versions...</p>

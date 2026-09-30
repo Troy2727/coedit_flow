@@ -193,11 +193,27 @@ export const updateGeneralAccess = async (roomId: string, generalAccess: General
   }
 }
 
+export const getDocumentVersions = async (roomId: string) => {
+  try {
+    await assertRoomPermission(roomId, 'editor');
+
+    const { data } = await liveblocks.getVersionHistory(roomId);
+
+    return parseStringify(data);
+  } catch (error) {
+    console.log(`Error happened while getting versions: ${error}`);
+  }
+}
+
 export const createVersionSnapshot = async (roomId: string) => {
   try {
     await assertRoomPermission(roomId, 'editor');
 
     const snapshot = await liveblocks.createVersionHistorySnapshot(roomId);
+
+    // Liveblocks can answer 204 "Could not create version" (e.g. edits not persisted yet)
+    // without throwing, so only a returned version id counts as success.
+    if(!snapshot?.data?.id) throw new Error(`No version created: ${JSON.stringify(snapshot)}`);
 
     return parseStringify(snapshot);
   } catch (error) {
