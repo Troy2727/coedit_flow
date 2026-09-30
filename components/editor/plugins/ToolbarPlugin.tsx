@@ -155,6 +155,7 @@ export default function ToolbarPlugin() {
         }}
         className="toolbar-item spaced"
         aria-label="Undo"
+        title="Undo (Ctrl+Z)"
       >
         <i className="format undo" />
       </button>
@@ -165,6 +166,7 @@ export default function ToolbarPlugin() {
         }}
         className="toolbar-item"
         aria-label="Redo"
+        title="Redo (Ctrl+Y)"
       >
         <i className="format redo" />
       </button>
@@ -175,6 +177,8 @@ export default function ToolbarPlugin() {
         className={
           'toolbar-item spaced ' + (activeBlock === 'h1' ? 'active' : '')
         }
+        aria-label="Heading 1"
+        title="Heading 1"
       >
         <i className="format h1" />
       </button>
@@ -184,6 +188,8 @@ export default function ToolbarPlugin() {
         className={
           'toolbar-item spaced ' + (activeBlock === 'h2' ? 'active' : '')
         }
+        aria-label="Heading 2"
+        title="Heading 2"
       >
         <i className="format h2" />
       </button>
@@ -193,6 +199,8 @@ export default function ToolbarPlugin() {
         className={
           'toolbar-item spaced ' + (activeBlock === 'h3' ? 'active' : '')
         }
+        aria-label="Heading 3"
+        title="Heading 3"
       >
         <i className="format h3" />
       </button>
@@ -203,6 +211,7 @@ export default function ToolbarPlugin() {
         }}
         className={'toolbar-item spaced ' + (isBold ? 'active' : '')}
         aria-label="Format Bold"
+        title="Bold (Ctrl+B)"
       >
         <i className="format bold" />
       </button>
@@ -212,6 +221,7 @@ export default function ToolbarPlugin() {
         }}
         className={'toolbar-item spaced ' + (isItalic ? 'active' : '')}
         aria-label="Format Italics"
+        title="Italic (Ctrl+I)"
       >
         <i className="format italic" />
       </button>
@@ -221,6 +231,7 @@ export default function ToolbarPlugin() {
         }}
         className={'toolbar-item spaced ' + (isUnderline ? 'active' : '')}
         aria-label="Format Underline"
+        title="Underline (Ctrl+U)"
       >
         <i className="format underline" />
       </button>
@@ -230,6 +241,7 @@ export default function ToolbarPlugin() {
         }}
         className={'toolbar-item spaced ' + (isStrikethrough ? 'active' : '')}
         aria-label="Format Strikethrough"
+        title="Strikethrough"
       >
         <i className="format strikethrough" />
       </button>
@@ -243,6 +255,7 @@ export default function ToolbarPlugin() {
         }}
         className="toolbar-item spaced"
         aria-label="Left Align"
+        title="Align left"
       >
         <i className="format left-align" />
       </button>
@@ -252,6 +265,7 @@ export default function ToolbarPlugin() {
         }}
         className="toolbar-item spaced"
         aria-label="Center Align"
+        title="Align center"
       >
         <i className="format center-align" />
       </button>
@@ -261,6 +275,7 @@ export default function ToolbarPlugin() {
         }}
         className="toolbar-item spaced"
         aria-label="Right Align"
+        title="Align right"
       >
         <i className="format right-align" />
       </button>
@@ -270,6 +285,7 @@ export default function ToolbarPlugin() {
         }}
         className="toolbar-item"
         aria-label="Justify Align"
+        title="Justify"
       >
         <i className="format justify-align" />
       </button>
