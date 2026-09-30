@@ -54,7 +54,7 @@ const Home = async () => {
                     <p className="text-sm font-light text-blue-100">Created about {dateConverter(createdAt)}</p>
                   </div>
                 </Link>
-                <DeleteModal roomId={id} />
+                {metadata.creatorId === clerkUser.id && <DeleteModal roomId={id} />}
               </li>
             ))}
           </ul>
