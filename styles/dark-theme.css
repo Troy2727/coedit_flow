@@ -267,6 +267,99 @@ body {
   list-style-type: none;
 }
 
+/* Tailwind preflight strips list markers, so restore them */
+.editor-list-ul {
+  list-style-type: disc;
+}
+
+.editor-list-ol {
+  list-style-type: decimal;
+}
+
+/* Checklist: CheckListPlugin toggles when the ::before box is clicked */
+.editor-listitem-checked,
+.editor-listitem-unchecked {
+  position: relative;
+  margin-left: 8px;
+  margin-right: 8px;
+  padding-left: 24px;
+  padding-right: 24px;
+  list-style-type: none;
+  outline: none;
+}
+
+.editor-listitem-checked {
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+.editor-listitem-checked:before,
+.editor-listitem-unchecked:before {
+  content: '';
+  width: 16px;
+  height: 16px;
+  top: 2px;
+  left: 0;
+  cursor: pointer;
+  display: block;
+  position: absolute;
+  border-radius: 3px;
+}
+
+.editor-listitem-unchecked:before {
+  border: 1px solid #b4c6ee;
+}
+
+.editor-listitem-checked:before {
+  border: 1px solid #3371ff;
+  background-color: #3371ff;
+}
+
+.editor-listitem-checked:after {
+  content: '';
+  cursor: pointer;
+  border-color: #fff;
+  border-style: solid;
+  position: absolute;
+  display: block;
+  top: 5px;
+  left: 6px;
+  width: 5px;
+  height: 9px;
+  transform: rotate(45deg);
+  border-width: 0 2px 2px 0;
+}
+
+/* lucide icons in the toolbar, styled like the existing i.format icons */
+.toolbar .toolbar-icon {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  color: #fff;
+  opacity: 0.6;
+}
+
+.toolbar .toolbar-item.active .toolbar-icon {
+  opacity: 1;
+}
+
+.toolbar .font-size-input {
+  width: 36px;
+  height: 28px;
+  margin-top: 3px;
+  border: 1px solid #27344d;
+  border-radius: 4px;
+  background: transparent;
+  color: #fff;
+  font-size: 14px;
+  text-align: center;
+  outline: none;
+}
+
+.toolbar .font-size-input:focus {
+  border-color: #3371ff;
+}
+
 pre::-webkit-scrollbar {
   background: transparent;
   width: 10px;

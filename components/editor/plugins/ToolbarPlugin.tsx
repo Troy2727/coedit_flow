@@ -25,9 +25,19 @@ import {
   $createQuoteNode,
   $isHeadingNode,
 } from '@lexical/rich-text';
+import {
+  $isListNode,
+  INSERT_CHECK_LIST_COMMAND,
+  INSERT_ORDERED_LIST_COMMAND,
+  INSERT_UNORDERED_LIST_COMMAND,
+  REMOVE_LIST_COMMAND,
+} from '@lexical/list';
 import { $setBlocksType } from '@lexical/selection';
 import { $findMatchingParent } from '@lexical/utils';
+import { List, ListChecks, ListOrdered } from 'lucide-react';
 import React from 'react';
+import LinkButton from './LinkButton';
+import TextStyleControls from './TextStyleControls';
 import {
   useCallback,
   useEffect,
@@ -122,6 +132,20 @@ export default function ToolbarPlugin() {
     }
   }
 
+  function toggleList(type: 'bullet' | 'number' | 'check') {
+    if (activeBlock === type) {
+      return editor.dispatchCommand(REMOVE_LIST_COMMAND, undefined);
+    }
+
+    const command = {
+      bullet: INSERT_UNORDERED_LIST_COMMAND,
+      number: INSERT_ORDERED_LIST_COMMAND,
+      check: INSERT_CHECK_LIST_COMMAND,
+    }[type];
+
+    editor.dispatchCommand(command, undefined);
+  }
+
   return (
     <div className="toolbar" ref={toolbarRef}>
       <button
@@ -210,6 +234,9 @@ export default function ToolbarPlugin() {
         <i className="format strikethrough" />
       </button>
       <Divider />
+      <TextStyleControls />
+      <LinkButton />
+      <Divider />
       <button
         onClick={() => {
           editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'left');
@@ -245,6 +272,31 @@ export default function ToolbarPlugin() {
         aria-label="Justify Align"
       >
         <i className="format justify-align" />
+      </button>
+      <Divider />
+      <button
+        onClick={() => toggleList('check')}
+        className={'toolbar-item spaced ' + (activeBlock === 'check' ? 'active' : '')}
+        aria-label="Checklist"
+        title="Checklist"
+      >
+        <ListChecks className="toolbar-icon" />
+      </button>
+      <button
+        onClick={() => toggleList('bullet')}
+        className={'toolbar-item spaced ' + (activeBlock === 'bullet' ? 'active' : '')}
+        aria-label="Bulleted list"
+        title="Bulleted list"
+      >
+        <List className="toolbar-icon" />
+      </button>
+      <button
+        onClick={() => toggleList('number')}
+        className={'toolbar-item ' + (activeBlock === 'number' ? 'active' : '')}
+        aria-label="Numbered list"
+        title="Numbered list"
+      >
+        <ListOrdered className="toolbar-icon" />
       </button>{' '}
     </div>
   );
@@ -280,6 +332,10 @@ function useActiveBlock() {
 
       if ($isHeadingNode(element)) {
         return element.getTag();
+      }
+
+      if ($isListNode(element)) {
+        return element.getListType();
       }
 
       return element.getType();

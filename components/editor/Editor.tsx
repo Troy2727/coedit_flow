@@ -9,7 +9,18 @@ import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
+import { ListPlugin } from '@lexical/react/LexicalListPlugin';
+import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin';
+import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin';
+import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
+import { AutoLinkPlugin } from '@lexical/react/LexicalAutoLinkPlugin';
+import { ClickableLinkPlugin } from '@lexical/react/LexicalClickableLinkPlugin';
+import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin';
+import { ListItemNode, ListNode } from '@lexical/list';
+import { AutoLinkNode, LinkNode } from '@lexical/link';
 import React from 'react';
+import { MARKDOWN_TRANSFORMERS } from './markdownTransformers';
+import { AUTO_LINK_MATCHERS, validateUrl } from './url';
 
 import { FloatingComposer, FloatingThreads, liveblocksConfig, LiveblocksPlugin, useIsEditorReady } from '@liveblocks/react-lexical'
 import Loader from '../Loader';
@@ -33,7 +44,7 @@ export function Editor({ roomId, currentUserType, isCreator }: { roomId: string,
 
   const initialConfig = liveblocksConfig({
     namespace: 'Editor',
-    nodes: [HeadingNode, QuoteNode],
+    nodes: [HeadingNode, QuoteNode, ListNode, ListItemNode, LinkNode, AutoLinkNode],
     onError: (error: Error) => {
       console.error(error);
       throw error;
@@ -63,6 +74,14 @@ export function Editor({ roomId, currentUserType, isCreator }: { roomId: string,
               {currentUserType === 'editor' && <FloatingToolbarPlugin />}
               <HistoryPlugin />
               <AutoFocusPlugin />
+              <ListPlugin />
+              <CheckListPlugin />
+              <TabIndentationPlugin />
+              <LinkPlugin validateUrl={validateUrl} />
+              <AutoLinkPlugin matchers={AUTO_LINK_MATCHERS} />
+              {/* Editors follow links from the link popover; viewers can click them directly */}
+              <ClickableLinkPlugin disabled={currentUserType === 'editor'} newTab />
+              <MarkdownShortcutPlugin transformers={MARKDOWN_TRANSFORMERS} />
             </div>
           )}
 
