@@ -2,7 +2,7 @@
 
 import Theme from './plugins/Theme';
 import ToolbarPlugin from './plugins/ToolbarPlugin';
-import { HeadingNode } from '@lexical/rich-text';
+import { HeadingNode, QuoteNode } from '@lexical/rich-text';
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
@@ -27,13 +27,13 @@ function Placeholder() {
   return <div className="editor-placeholder">Enter some rich text...</div>;
 }
 
-export function Editor({ roomId, currentUserType }: { roomId: string, currentUserType: UserType }) {
+export function Editor({ roomId, currentUserType, isCreator }: { roomId: string, currentUserType: UserType, isCreator: boolean }) {
   const status = useEditorStatus();
   const { threads } = useThreads();
 
   const initialConfig = liveblocksConfig({
     namespace: 'Editor',
-    nodes: [HeadingNode],
+    nodes: [HeadingNode, QuoteNode],
     onError: (error: Error) => {
       console.error(error);
       throw error;
@@ -47,7 +47,7 @@ export function Editor({ roomId, currentUserType }: { roomId: string, currentUse
       <div className="editor-container size-full">
         <div className="toolbar-wrapper flex min-w-full justify-between">
           <ToolbarPlugin />
-          {currentUserType === 'editor' && <DeleteModal roomId={roomId} />}
+          {isCreator && <DeleteModal roomId={roomId} />}
         </div>
 
         <div className="editor-wrapper flex flex-col items-center justify-start">

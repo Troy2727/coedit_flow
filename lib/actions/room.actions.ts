@@ -5,11 +5,38 @@ import { liveblocks } from '../liveblocks';
 import { revalidatePath } from 'next/cache';
 import { getAccessType, parseStringify } from '../utils';
 import { redirect } from 'next/navigation';
+import { currentUser } from '@clerk/nextjs/server';
+
+// Server actions are public endpoints, so every action re-checks the caller server-side.
+const getCurrentUserEmail = async () => {
+  const clerkUser = await currentUser();
+  if(!clerkUser) throw new Error('You must be signed in');
+
+  return clerkUser.emailAddresses[0].emailAddress;
+}
+
+const assertRoomPermission = async (roomId: string, level: 'editor' | 'creator') => {
+  const email = await getCurrentUserEmail();
+  const room = await liveblocks.getRoom(roomId);
+
+  const allowed = level === 'creator'
+    ? room.metadata.email === email
+    : (room.usersAccesses[email] as string[] | undefined)?.includes('room:write');
+
+  if(!allowed) throw new Error('You do not have permission to do this');
+
+  return room;
+}
 
 export const createDocument = async ({ userId, email }: CreateDocumentParams) => {
   const roomId = nanoid();
 
   try {
+    const clerkUser = await currentUser();
+    if(!clerkUser || clerkUser.id !== userId || clerkUser.emailAddresses[0].emailAddress !== email) {
+      throw new Error('You can only create documents for yourself');
+    }
+
     const metadata = {
       creatorId: userId,
       email,
@@ -36,8 +63,12 @@ export const createDocument = async ({ userId, email }: CreateDocumentParams) =>
 
 export const getDocument = async ({ roomId, userId }: { roomId: string; userId: string }) => {
   try {
+      if(userId !== await getCurrentUserEmail()) {
+        throw new Error('You do not have access to this document');
+      }
+
       const room = await liveblocks.getRoom(roomId);
-    
+
       const hasAccess = Object.keys(room.usersAccesses).includes(userId);
     
       if(!hasAccess) {
@@ -52,6 +83,8 @@ export const getDocument = async ({ roomId, userId }: { roomId: string; userId: 
 
 export const updateDocument = async (roomId: string, title: string) => {
   try {
+    await assertRoomPermission(roomId, 'editor');
+
     const updatedRoom = await liveblocks.updateRoom(roomId, {
       metadata: {
         title
@@ -68,6 +101,10 @@ export const updateDocument = async (roomId: string, title: string) => {
 
 export const getDocuments = async (email: string ) => {
   try {
+      if(email !== await getCurrentUserEmail()) {
+        throw new Error('You can only list your own documents');
+      }
+
       const rooms = await liveblocks.getRooms({ userId: email });
     
       return parseStringify(rooms);
@@ -78,6 +115,12 @@ export const getDocuments = async (email: string ) => {
 
 export const updateDocumentAccess = async ({ roomId, email, userType, updatedBy }: ShareDocumentParams) => {
   try {
+    const existingRoom = await assertRoomPermission(roomId, 'editor');
+
+    if(existingRoom.metadata.email === email) {
+      throw new Error("The owner's access cannot be changed");
+    }
+
     const usersAccesses: RoomAccesses = {
       [email]: getAccessType(userType) as AccessType,
     }
@@ -113,7 +156,7 @@ export const updateDocumentAccess = async ({ roomId, email, userType, updatedBy 
 
 export const removeCollaborator = async ({ roomId, email }: {roomId: string, email: string}) => {
   try {
-    const room = await liveblocks.getRoom(roomId)
+    const room = await assertRoomPermission(roomId, 'editor');
 
     if(room.metadata.email === email) {
       throw new Error('You cannot remove yourself from the document');
@@ -134,6 +177,8 @@ export const removeCollaborator = async ({ roomId, email }: {roomId: string, ema
 
 export const deleteDocument = async (roomId: string) => {
   try {
+    await assertRoomPermission(roomId, 'creator');
+
     await liveblocks.deleteRoom(roomId);
     revalidatePath('/');
     redirect('/');

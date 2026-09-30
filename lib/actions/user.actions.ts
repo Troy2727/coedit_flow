@@ -1,11 +1,13 @@
 'use server';
 
-import { clerkClient } from "@clerk/nextjs/server";
+import { clerkClient, currentUser as getSignedInUser } from "@clerk/nextjs/server";
 import { parseStringify } from "../utils";
 import { liveblocks } from "../liveblocks";
 
 export const getClerkUsers = async ({ userIds }: { userIds: string[]}) => {
   try {
+    if(!await getSignedInUser()) throw new Error('You must be signed in');
+
     const { data } = await clerkClient.users.getUserList({
       emailAddress: userIds,
     });
@@ -27,7 +29,12 @@ export const getClerkUsers = async ({ userIds }: { userIds: string[]}) => {
 
 export const getDocumentUsers = async ({ roomId, currentUser, text }: { roomId: string, currentUser: string, text: string }) => {
   try {
+    const clerkUser = await getSignedInUser();
     const room = await liveblocks.getRoom(roomId);
+
+    if(!clerkUser || !room.usersAccesses[clerkUser.emailAddresses[0].emailAddress]) {
+      throw new Error('You do not have access to this document');
+    }
 
     const users = Object.keys(room.usersAccesses).filter((email) => email !== currentUser);
 
