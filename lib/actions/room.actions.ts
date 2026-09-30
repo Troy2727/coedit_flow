@@ -175,6 +175,18 @@ export const removeCollaborator = async ({ roomId, email }: {roomId: string, ema
   }
 }
 
+export const createVersionSnapshot = async (roomId: string) => {
+  try {
+    await assertRoomPermission(roomId, 'editor');
+
+    const snapshot = await liveblocks.createVersionHistorySnapshot(roomId);
+
+    return parseStringify(snapshot);
+  } catch (error) {
+    console.log(`Error happened while saving a version: ${error}`);
+  }
+}
+
 export const deleteDocument = async (roomId: string) => {
   try {
     await assertRoomPermission(roomId, 'creator');

@@ -18,7 +18,8 @@ import { ClickableLinkPlugin } from '@lexical/react/LexicalClickableLinkPlugin';
 import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin';
 import { ListItemNode, ListNode } from '@lexical/list';
 import { AutoLinkNode, LinkNode } from '@lexical/link';
-import React from 'react';
+import { History } from 'lucide-react';
+import React, { useState } from 'react';
 import { MARKDOWN_TRANSFORMERS } from './markdownTransformers';
 import { AUTO_LINK_MATCHERS, validateUrl } from './url';
 
@@ -29,6 +30,7 @@ import FloatingToolbarPlugin from './plugins/FloatingToolbarPlugin'
 import { useThreads } from '@liveblocks/react/suspense';
 import Comments from '../Comments';
 import { DeleteModal } from '../DeleteModal';
+import VersionHistory from '../VersionHistory';
 
 // Catch any errors that occur during Lexical updates and log them
 // or throw them as needed. If you don't throw them, Lexical will
@@ -41,6 +43,7 @@ function Placeholder() {
 export function Editor({ roomId, currentUserType, isCreator }: { roomId: string, currentUserType: UserType, isCreator: boolean }) {
   const ready = useIsEditorReady();
   const { threads } = useThreads();
+  const [historyOpen, setHistoryOpen] = useState(false);
 
   const initialConfig = liveblocksConfig({
     namespace: 'Editor',
@@ -58,7 +61,20 @@ export function Editor({ roomId, currentUserType, isCreator }: { roomId: string,
       <div className="editor-container size-full">
         <div className="toolbar-wrapper flex min-w-full justify-between">
           <ToolbarPlugin />
-          {isCreator && <DeleteModal roomId={roomId} />}
+          <div className="flex items-center gap-1">
+            {currentUserType === 'editor' && (
+              <button
+                onClick={() => setHistoryOpen(true)}
+                className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm text-blue-100 hover:bg-dark-300"
+                aria-label="Version history"
+                title="Version history"
+              >
+                <History className="size-5" />
+                <span className="hidden md:inline">History</span>
+              </button>
+            )}
+            {isCreator && <DeleteModal roomId={roomId} />}
+          </div>
         </div>
 
         <div className="editor-wrapper flex flex-col items-center justify-start">
@@ -89,6 +105,9 @@ export function Editor({ roomId, currentUserType, isCreator }: { roomId: string,
             <FloatingComposer className="w-[350px]" />
             <FloatingThreads threads={threads} />
             <Comments />
+            {currentUserType === 'editor' && (
+              <VersionHistory roomId={roomId} open={historyOpen} onOpenChange={setHistoryOpen} />
+            )}
           </LiveblocksPlugin>
         </div>
       </div>

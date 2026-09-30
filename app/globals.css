@@ -264,6 +264,12 @@
   --lb-dynamic-background: #1b2840;
 }
 
+.version-history .lb-root {
+  --lb-background: #0b1527;
+  --lb-foreground: #ffffff;
+  --lb-accent: #3371ff;
+}
+
 .lb-comment,
 .lb-thread-comments,
 .lb-composer,
