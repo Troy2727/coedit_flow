@@ -1,363 +1,233 @@
 <div align="center">
-  <br />
-  <img src="https://github.com/user-attachments/assets/eaaeb1f0-22da-46be-9e29-9bef70e0039d" alt="Project Banner" width="600"/>
+  <img src="https://github.com/user-attachments/assets/eaaeb1f0-22da-46be-9e29-9bef70e0039d" alt="LiveDocs banner" width="100%" />
   <br />
   <br />
   <p>
-    <img src="https://img.shields.io/badge/-Next_JS-black?style=for-the-badge&logoColor=white&logo=nextdotjs&color=61DAFB" alt="next.js" />
-    <img src="https://img.shields.io/badge/-TypeScript-black?style=for-the-badge&logoColor=white&logo=typescript&color=3178C6" alt="typescript" />
-    <img src="https://img.shields.io/badge/-Tailwind_CSS-black?style=for-the-badge&logoColor=white&logo=tailwindcss&color=06B6D4" alt="tailwindcss" />
+    <img src="https://img.shields.io/badge/-Next.js_14-black?style=for-the-badge&logoColor=white&logo=nextdotjs&color=000000" alt="Next.js" />
+    <img src="https://img.shields.io/badge/-TypeScript-black?style=for-the-badge&logoColor=white&logo=typescript&color=3178C6" alt="TypeScript" />
+    <img src="https://img.shields.io/badge/-Tailwind_CSS-black?style=for-the-badge&logoColor=white&logo=tailwindcss&color=06B6D4" alt="Tailwind CSS" />
+    <img src="https://img.shields.io/badge/-Liveblocks-black?style=for-the-badge&logoColor=white&color=6C47FF" alt="Liveblocks" />
+    <img src="https://img.shields.io/badge/-Lexical-black?style=for-the-badge&logoColor=white&color=2F80ED" alt="Lexical" />
+    <img src="https://img.shields.io/badge/-Clerk-black?style=for-the-badge&logoColor=white&logo=clerk&color=6C47FF" alt="Clerk" />
+    <img src="https://img.shields.io/badge/-Playwright-black?style=for-the-badge&logoColor=white&logo=playwright&color=2EAD33" alt="Playwright" />
   </p>
-  <h1 align="center">Live Docs Application</h1>
-  <p align="center">📄 Real-Time Collaborative Document Editor</p>
-  <p align="center">
-     Live Docs Application is a full-featured, real-time collaborative document editor inspired by Google Docs. Built with modern web technologies, it enables multiple users to edit documents simultaneously while showcasing seamless frontend–backend integration. The platform includes live cursors, inline commenting, role-based permissions, and version history — all supported by a scalable real-time infrastructure. This project demonstrates advanced knowledge of state synchronization, WebSockets, access control, and conflict resolution, with a strong focus on performance and user experience.
+  <h1>LiveDocs</h1>
+  <p><b>A real-time collaborative document editor, inspired by Google Docs.</b></p>
+  <p>
+    Several people can edit the same document at once and see each other's cursors, comment on text,
+    share with view or edit access, and roll back to earlier versions. It's built on a CRDT sync engine,
+    with permissions enforced on the server and an end-to-end test suite that drives two browsers at once.
   </p>
 </div>
+
+<br />
+
+![The LiveDocs editor with a second collaborator's live cursor, a comment thread, and the document outline](docs/images/editor.png)
 
 ---
 
 ## 📋 Table of Contents
 
-1. [🤖 Introduction](#introduction)
-2. [⚙️ Tech Stack](#tech-stack)
-3. [🔋 Features](#features)
-4. [🤸 Quick Start](#quick-start)
-5. [🕸️ Snippets (Code to Copy)](#snippets)
-6. [🔗 Links & Assets](#links)
-7. [👨‍💻 Author](#author)
-8. [📄 License](#license)
+1. [Features](#-features)
+2. [Screenshots](#-screenshots)
+3. [Architecture](#-architecture)
+4. [Engineering Highlights](#-engineering-highlights)
+5. [Tech Stack](#-tech-stack)
+6. [Getting Started](#-getting-started)
+7. [Testing](#-testing)
+8. [Project Structure](#-project-structure)
+9. [Roadmap](#-roadmap)
+10. [Author](#-author)
 
 ---
 
-## 🤖 Introduction
+## ✨ Features
 
-The Live Docs Application was created to demonstrate the power of building real-time collaborative applications with a modern tech stack. It simulates a simplified version of Google Docs, where multiple users can:
+**👥 Real-time collaboration**
+- Multiple people edit the same document simultaneously; changes merge without conflicts (CRDT)
+- Live cursors and selections labelled with each collaborator's name
+- Avatars of everyone currently in the document
 
-- Collaborate on documents in real-time
-- View active participants
-- Leave comments
-- Manage and share documents securely
+**📝 Rich-text editing**
+- Headings, bold, italic, underline, strikethrough, and text alignment
+- Font size, text color, and highlight color
+- Bulleted, numbered, and checklist lists (Tab to nest)
+- Links with `Ctrl+K`, auto-linking of typed URLs, and blocking of unsafe (`javascript:`) links
+- Markdown shortcuts: `#` headings, `-` bullets, `1.` numbers, `[]` checkboxes, `**bold**`, `[text](url)`
+- Every toolbar button shows its name and keyboard shortcut on hover
 
-<a href="https://discord.gg/z73j2jb4" target="_blank">
-  <img src="https://github.com/sujatagunale/EasyRead/assets/151519281/618f4872-1e10-42da-8213-1d69e486d02e" alt="Join our Discord community" width="180px" />
-</a>
+**💬 Comments & notifications**
+- Comment on any selected text, with threaded replies and resolving
+- `@mentions` of collaborators
+- In-app notification inbox for mentions, replies, and documents shared with you
+
+**🔗 Sharing & permissions**
+- Invite people by email as **viewers** (read-only) or **editors**
+- "**Anyone with the link** can view / edit", plus Copy link
+- Only the owner can delete a document; the owner's access can't be removed
+
+**🕓 Version history**
+- Save a version at any time, preview older versions read-only, and restore one for everyone
+
+**📄 Document tools**
+- Outline sidebar built from the document's headings (click to jump)
+- Live word count
+- Download as **Markdown**, or as **PDF** through the browser's print dialog (print styles hide the app UI)
+
+**🗂️ Documents home**
+- Search documents by title
+- Sorted by when each document was last opened
+
+---
+
+## 🖼️ Screenshots
+
+**Sharing: invite by email, choose a role, or share by link**
+
+![Share dialog with an invited editor and "Anyone with the link can view" access](docs/images/sharing.png)
+
+**Version history: preview any saved version and restore it**
+
+![Version history panel showing a saved version and its preview](docs/images/version-history.png)
+
+**Home: all documents, searchable and sorted by last opened**
+
+![Documents home page with a search box and a list of documents](docs/images/home.png)
+
+---
+
+## 🏗️ Architecture
+
+```mermaid
+flowchart LR
+  subgraph Browser["Browser (Next.js client)"]
+    Editor["Lexical editor<br/>+ Liveblocks React"]
+  end
+
+  subgraph Server["Next.js server"]
+    Actions["Server actions<br/>(documents, sharing, versions)"]
+    AuthRoute["/api/liveblocks-auth"]
+  end
+
+  Clerk["Clerk<br/>(sign-in, sessions, users)"]
+  Liveblocks["Liveblocks<br/>(Yjs CRDT sync, presence,<br/>comments, versions, rooms)"]
+
+  Editor <-- "WebSocket: document updates,<br/>cursors, comments" --> Liveblocks
+  Editor -- "get room token" --> AuthRoute
+  Editor -- "rename, share, delete, save version" --> Actions
+  AuthRoute -- "verify session" --> Clerk
+  Actions -- "verify session + role" --> Clerk
+  AuthRoute -- "identify user" --> Liveblocks
+  Actions -- "REST: rooms, access lists, versions" --> Liveblocks
+```
+
+- **Each document is a Liveblocks room.** The room holds the Yjs document, comments, and versions. Its metadata holds the title and owner, and its access lists hold who can view or edit. There's no separate database.
+- **The editor syncs directly with Liveblocks** over a WebSocket. The Next.js server is only involved to issue a room token and to perform privileged actions.
+- **Clerk** handles sign-in (Google, or email + password with email verification) and supplies user names and avatars.
+
+---
+
+## 🔍 Engineering Highlights
+
+- **Conflict-free real-time editing with CRDTs.** Documents are Yjs CRDTs bound to Lexical. When two people type in the same place, edits merge deterministically on every client, with no locking and no "last write wins".
+- **Authorization on the server, not just in the UI.** Next.js server actions are public HTTP endpoints, so hiding a button isn't security. Every action re-verifies the Clerk session and checks the caller's role on that room before touching data: editors can rename and share, only owners can delete, and nobody can change the owner's access. Liveblocks separately enforces room permissions on the real-time connection.
+- **One permissions model for invites and link sharing.** Invited users get per-email access. "Anyone with the link" maps to the room's default access, and every server-side check falls back to it.
+- **End-to-end tests with two real browsers.** Playwright signs in two Clerk test users and verifies that one user's typing and cursor appear in the other's browser live. It also covers viewer restrictions, link sharing, version restore, and formatting. Making this suite reliable surfaced three real issues:
+  - a system clock drifting 6 seconds, which made Clerk reject fresh session tokens
+  - a mismatch between the Liveblocks SDK's TypeScript types and its API responses
+  - a development-only React Strict Mode double-mount that detached a collaborator's editor. The suite now runs against a production build.
 
 ---
 
 ## ⚙️ Tech Stack
 
-🖥️ **Frontend**
-- Next.js (App Router) — Routing, server functions, and performance optimizations
-- TypeScript — Type safety for scalability and maintainability
-- Tailwind CSS — Utility-first CSS framework
-- ShadCN — UI component library
-
-📚 **Editor**
-- Lexical — Modular, performant rich-text editor with custom plugins
-- Liveblocks — CRDT-based real-time synchronization, presence tracking, storage
-
-🔐 **Authentication & Authorization**
-- Clerk — User auth, role-based access, session management (OAuth, JWT)
-
-💾 **Backend**
-- PostgreSQL — Relational database for document metadata and user relationships
-- Prisma — Type-safe ORM for database access
-- Edge/Serverless Functions — Handle document CRUD and notification logic
-
-🔁 **Realtime & Collaboration**
-- Liveblocks Storage & Presence — Conflict-free live editing and presence indicators
-- Webhooks — Send notification events or email invites
-
-🚀 **Deployment**
-- Vercel — Edge hosting, CI/CD, analytics
+| Layer | Technology |
+|---|---|
+| Framework | [Next.js 14](https://nextjs.org) (App Router, Server Actions), React 18, TypeScript |
+| Editor | [Lexical](https://lexical.dev) with list, link, markdown, and table-of-contents plugins |
+| Real-time | [Liveblocks](https://liveblocks.io) (Yjs CRDT sync, presence, comments, notifications, version history) |
+| Auth | [Clerk](https://clerk.com) (Google OAuth, email + password) |
+| UI | [Tailwind CSS](https://tailwindcss.com), [shadcn/ui](https://ui.shadcn.com) (Radix), [Lucide](https://lucide.dev) icons |
+| Testing | [Playwright](https://playwright.dev) with [@clerk/testing](https://clerk.com/docs/testing/playwright/overview) |
 
 ---
 
-## 🔋 Features
+## 🚀 Getting Started
 
-🔐 **Authentication**
-- Secure sign-in and session management via Clerk
-- Social login options and email verification
-- Role-based access control
-
-📝 **Real-Time Editing**
-- Collaborative editing powered by Lexical and Liveblocks
-- Rich text formatting with customizable styles
-- Image embedding and document structuring
-
-📁 **Document Management**
-- Create, delete, search, and organize documents
-- Document history and version control
-- Categorization and tagging system
-
-🔗 **Sharing & Permissions**
-- Share documents with role-based access
-- Invite collaborators via email
-- Public/private visibility settings
-
-💬 **Commenting**
-- Inline and general threaded comments
-- @mentions and notifications
-- Comment resolution tracking
-
-👥 **Live Presence**
-- View active collaborators in real time
-- Cursor and selection tracking
-- User activity indicators
-
-🔔 **Notifications**
-- In-app alerts for collaboration events
-- Email notifications for important updates
-- Customizable notification preferences
-
-📱 **Responsive Design**
-- Optimized UI for desktop and mobile devices
-- Consistent experience across different screen sizes
-- Touch-friendly controls for mobile editing
-
----
-
-## 🤸 Quick Start
-
-Follow these steps to set up the project locally on your machine.
-
-### **Prerequisites**
-
-Make sure you have the following installed on your machine:
-
-- [Git](https://git-scm.com/)
-- [Node.js](https://nodejs.org/en)
-- [npm](https://www.npmjs.com/) (Node Package Manager)
-
-### **Cloning the Repository**
+**Prerequisites:** [Node.js](https://nodejs.org) 18+, plus free [Clerk](https://clerk.com) and [Liveblocks](https://liveblocks.io) accounts.
 
 ```bash
 git clone https://github.com/Troy2727/coedit_flow.git
 cd coedit_flow
-```
-
-### **Installation**
-
-Install the project dependencies using npm:
-
-```bash
 npm install
 ```
 
-### **Set Up Environment Variables**
-
-Create a new file named `.env` in the root of your project and add the following content:
+Create a `.env.local` file in the project root (it's git-ignored):
 
 ```env
-# Clerk
+# Clerk: dashboard.clerk.com → API Keys
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
 CLERK_SECRET_KEY=
-NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
-NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
 
-# Liveblocks
-NEXT_PUBLIC_LIVEBLOCKS_PUBLIC_KEY=
+# Liveblocks: liveblocks.io/dashboard → API keys
 LIVEBLOCKS_SECRET_KEY=
 ```
 
-Replace the placeholder values with your actual Clerk & Liveblocks credentials. You can obtain these credentials by signing up on the [Clerk](https://clerk.com/) and [Liveblocks](https://liveblocks.io/) websites.
-
-### **Running the Project**
+In the Clerk dashboard, under **User & Authentication**, enable **Email address** and **Password**, and optionally **Google**. To have versions created automatically as well as on demand, enable **Version history** in your Liveblocks project settings.
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser to view the project.
+Open [http://localhost:3001](http://localhost:3001).
 
 ---
 
-## 🕸️ Snippets
+## 🧪 Testing
 
-<details>
-<summary><code>globals.css</code> (Click to expand)</summary>
-
-```css
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* Liveblocks styles */
-/* @import "@liveblocks/react-ui/styles.css"; */
-/* @import "@liveblocks/react-lexical/styles.css"; */
-
-/* Custom theme */
-/* @import "../styles/dark-theme.css"; */
-
-/* TAILWIND STYLES */
-@layer base {
-  :root {
-    background: #09111f;
-    color: #fff;
-    margin: 0;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
-    border-radius: 50px;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar-track {
-    background: #09090a;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #2e3d5b;
-    border-radius: 50px;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #7878a3;
-  }
-}
-
-/* More styles omitted for brevity */
+```bash
+npx playwright install chromium   # first time only
+npm run test:e2e                  # builds the app and runs 16 end-to-end tests
 ```
 
-</details>
+The tests build the app for production and serve it on port 3002, so they can run while `npm run dev` is using 3001. They create two Clerk test users (`+clerk_test` addresses, so no real email is ever sent) and delete every document they create when they finish.
 
-<details>
-<summary><code>tailwind.config.ts</code> (Click to expand)</summary>
-
-```typescript
-import type { Config } from 'tailwindcss';
-
-const { fontFamily } = require('tailwindcss/defaultTheme');
-
-const config = {
-  darkMode: ['class'],
-  content: [
-    './pages/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './app/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
-  ],
-  prefix: '',
-  theme: {
-    container: {
-      center: true,
-      padding: '2rem',
-      screens: {
-        '2xl': '1400px',
-        xs: '360px',
-      },
-    },
-    extend: {
-      colors: {
-        blue: {
-          100: '#B4C6EE',
-          400: '#417BFF',
-          500: '#3371FF',
-        },
-        red: {
-          400: '#DD4F56',
-          500: '#DC4349',
-        },
-        dark: {
-          100: '#09111F',
-          200: '#0B1527',
-          300: '#0F1C34',
-          350: '#12213B',
-          400: '#27344D',
-          500: '#2E3D5B',
-        },
-      },
-      /* More configuration omitted for brevity */
-    },
-  },
-  plugins: [require('tailwindcss-animate')],
-} satisfies Config;
-
-export default config;
-```
-
-</details>
-
-<details>
-<summary><code>types/index.d.ts</code> (Click to expand)</summary>
-
-```typescript
-/* eslint-disable no-unused-vars */
-declare type SearchParamProps = {
-  params: { [key: string]: string };
-  searchParams: { [key: string]: string | string[] | undefined };
-};
-
-declare type AccessType = ["room:write"] | ["room:read", "room:presence:write"];
-
-declare type RoomAccesses = Record<string, AccessType>;
-
-declare type UserType = "creator" | "editor" | "viewer";
-
-/* More type definitions omitted for brevity */
-```
-
-</details>
+To regenerate the screenshots in this README: `npm run screenshots`.
 
 ---
 
-## 🔗 Links & Assets
-
-- Public assets used in the project can be found [here](https://drive.google.com/file/d/1MCQaP-imgDdopwcUn4CN_D-WglDc--Ho/view?usp=sharing)
-- [Liveblocks Starter Guide](https://liveblocks.io/docs/get-started/nextjs-lexical)
-
-### Useful Links
-
-- [Liveblocks](https://liveblocks.io) - Real-time collaboration infrastructure
-- [Lexical](https://lexical.dev/) - Extensible text editor framework
-- [Clerk](https://clerk.dev/) - Authentication and user management
-- [Next.js](https://nextjs.org) - React framework for production
-- [TypeScript](https://www.typescriptlang.org/) - Typed JavaScript
-- [Tailwind CSS](https://tailwindcss.com) - Utility-first CSS framework
-- [ShadCN](https://ui.shadcn.dev/) - UI component library
-
-💡 **Bonus Tip: Visualizing the Stack**
-
-Many developers include a diagram like this to give a clearer understanding of the application's architecture and flow. This is what it looks like for the Live Docs Application:
+## 📁 Project Structure
 
 ```
-┌──────────────────────────────────────────────┐
-│ Client (Next.js + Lexical + Tailwind)        │
-└───────────────┬──────────────────────────────┘
-                ↓
-┌──────────────────────────────────────────────┐
-│ Liveblocks (Realtime Sync, Presence)         │
-└───────────────┬──────────────────────────────┘
-                ↓
-┌──────────────────────────────────────────────┐
-│ Database (PostgreSQL via Prisma)             │
-└───────────────┬──────────────────────────────┘
-                ↓
-┌──────────────────────────────────────────────┐
-│ Clerk (Auth & RBAC)                          │
-└───────────────┬──────────────────────────────┘
-                ↓
-┌──────────────────────────────────────────────┐
-│ Vercel (Deploy & Edge Functions)             │
-└──────────────────────────────────────────────┘
+app/
+  (root)/page.tsx                 Documents home (search, last opened)
+  (root)/documents/[id]/page.tsx  Document page: loads the room, resolves the user's role
+  api/liveblocks-auth/route.ts    Issues Liveblocks room tokens for signed-in users
+components/
+  editor/                         Lexical editor, toolbar, and plugins
+  VersionHistory.tsx              Version history panel
+  ShareModal.tsx, GeneralAccess.tsx  Invites, roles, and link sharing
+lib/actions/                      Server actions with session and role checks
+e2e/                              Playwright end-to-end tests
 ```
+
+---
+
+## 🗺️ Roadmap
+
+- Images and tables in documents
+- Suggesting mode (tracked changes)
+- AI writing assistant (improve, summarize, translate a selection)
+- Commenter role and ownership transfer
 
 ---
 
 ## 👨‍💻 Author
 
-Alex Mieses
+**Alex Mieses** · [GitHub](https://github.com/Troy2727)
 
 ---
 
 ## 📄 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
-
----
-
-## ✨ Crafted with Excellence
-
-© 2025 Alex Mieses. All rights reserved.
