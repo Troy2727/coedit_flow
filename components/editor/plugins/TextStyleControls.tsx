@@ -59,8 +59,8 @@ export default function TextStyleControls() {
 
   return (
     <>
-      <div className="flex items-center" title="Font size">
-        <button className="toolbar-item" aria-label="Decrease font size" onClick={() => applyFontSize(currentSize - 1)}>
+      <div className="flex items-center">
+        <button className="toolbar-item" aria-label="Decrease font size" title="Decrease font size" onClick={() => applyFontSize(currentSize - 1)}>
           <Minus className="toolbar-icon" />
         </button>
         <input
@@ -74,9 +74,10 @@ export default function TextStyleControls() {
             }
           }}
           aria-label="Font size"
+          title="Font size"
           className="font-size-input"
         />
-        <button className="toolbar-item spaced" aria-label="Increase font size" onClick={() => applyFontSize(currentSize + 1)}>
+        <button className="toolbar-item spaced" aria-label="Increase font size" title="Increase font size" onClick={() => applyFontSize(currentSize + 1)}>
           <Plus className="toolbar-icon" />
         </button>
       </div>
