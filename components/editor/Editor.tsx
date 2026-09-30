@@ -27,6 +27,9 @@ import { FloatingComposer, FloatingThreads, liveblocksConfig, LiveblocksPlugin, 
 import Loader from '../Loader';
 
 import FloatingToolbarPlugin from './plugins/FloatingToolbarPlugin'
+import DocumentOutline from './plugins/DocumentOutline';
+import WordCount from './plugins/WordCount';
+import ExportMenu from './plugins/ExportMenu';
 import { useThreads } from '@liveblocks/react/suspense';
 import Comments from '../Comments';
 import { DeleteModal } from '../DeleteModal';
@@ -40,7 +43,7 @@ function Placeholder() {
   return <div className="editor-placeholder">Enter some rich text...</div>;
 }
 
-export function Editor({ roomId, currentUserType, isCreator }: { roomId: string, currentUserType: UserType, isCreator: boolean }) {
+export function Editor({ roomId, currentUserType, isCreator, title }: { roomId: string, currentUserType: UserType, isCreator: boolean, title: string }) {
   const ready = useIsEditorReady();
   const { threads } = useThreads();
   const [historyOpen, setHistoryOpen] = useState(false);
@@ -62,6 +65,8 @@ export function Editor({ roomId, currentUserType, isCreator }: { roomId: string,
         <div className="toolbar-wrapper flex min-w-full justify-between">
           <ToolbarPlugin />
           <div className="flex items-center gap-1">
+            <WordCount />
+            <ExportMenu title={title} />
             {currentUserType === 'editor' && (
               <button
                 onClick={() => setHistoryOpen(true)}
@@ -79,6 +84,8 @@ export function Editor({ roomId, currentUserType, isCreator }: { roomId: string,
 
         <div className="editor-wrapper flex flex-col items-center justify-start">
           {!ready ? <Loader /> : (
+            <>
+            <DocumentOutline />
             <div className="editor-inner min-h-[1100px] relative mb-5 h-fit w-full max-w-[800px] shadow-md lg:mb-10">
               <RichTextPlugin
                 contentEditable={
@@ -99,6 +106,7 @@ export function Editor({ roomId, currentUserType, isCreator }: { roomId: string,
               <ClickableLinkPlugin disabled={currentUserType === 'editor'} newTab />
               <MarkdownShortcutPlugin transformers={MARKDOWN_TRANSFORMERS} />
             </div>
+            </>
           )}
 
           <LiveblocksPlugin>

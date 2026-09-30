@@ -111,6 +111,11 @@
     @apply custom-scrollbar h-[calc(100vh-140px)] gap-5 overflow-auto px-5 pt-5 lg:flex-row lg:items-start lg:justify-center  xl:gap-10 xl:pt-10;
   }
 
+  /* Only on wide screens, where it fits beside the page and the comments */
+  .document-outline {
+    @apply sticky top-0 hidden w-[200px] shrink-0 2xl:block;
+  }
+
   .header {
     @apply min-h-[92px] min-w-full flex-nowrap bg-dark-100 flex w-full items-center justify-between gap-2 px-4;
   }
@@ -494,5 +499,45 @@
   100% {
     transform: rotate(360deg) translateY(calc(var(--radius) * 1px)) translateX(calc(var(--offset, 0) * 1px)) rotate(-360deg);
     }
+  }
+}
+/* ======================== Print / Save as PDF */
+@media print {
+  .header,
+  .toolbar-wrapper,
+  .document-outline,
+  .comments-container,
+  .lb-root {
+    display: none !important;
+  }
+
+  body,
+  .collaborative-room,
+  .editor-wrapper,
+  .editor-inner {
+    height: auto !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    background: #fff !important;
+    box-shadow: none !important;
+  }
+
+  .editor-wrapper {
+    padding: 0 !important;
+  }
+
+  .editor-inner {
+    max-width: none !important;
+  }
+
+  /* Theme text becomes black; colors users picked (inline styles) still win */
+  .editor-input,
+  .editor-input * {
+    color: #000;
+  }
+
+  .editor-input {
+    padding: 0 !important;
   }
 }
