@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test';
 
-import { createDocument, editorOf, expect, openAs, test } from './helpers';
+import { createDocument, editorOf, expect, openAs, test, waitForEditor } from './helpers';
 import { GUEST, OWNER } from './test-users';
 
 test.use({ user: OWNER });
@@ -43,7 +43,7 @@ test('two editors see each other’s changes and presence in real time', async (
 
   const guest = await openAs(browser, GUEST);
   await guest.page.goto(`/documents/${roomId}`);
-  await expect(editorOf(guest.page)).toBeVisible();
+  await waitForEditor(guest.page);
 
   // Presence: each sees the other's avatar
   await expect(page.getByAltText(`${GUEST.firstName} ${GUEST.lastName}`)).toBeVisible();
@@ -68,6 +68,7 @@ test('invited viewers get a read-only document', async ({ page, browser }) => {
   const guest = await openAs(browser, GUEST);
   await guest.page.goto(`/documents/${roomId}`);
 
+  await waitForEditor(guest.page);
   await expect(guest.page.getByText('View only')).toBeVisible();
   await expect(editorOf(guest.page)).toHaveAttribute('contenteditable', 'false');
   await expect(guest.page.getByRole('button', { name: 'Version history' })).toHaveCount(0);
@@ -82,6 +83,7 @@ test('"anyone with the link" sharing grants and revokes access', async ({ page, 
 
   const guest = await openAs(browser, GUEST);
   await guest.page.goto(`/documents/${roomId}`);
+  await waitForEditor(guest.page);
   await expect(guest.page.getByText('View only')).toBeVisible();
 
   await setGeneralAccess(page, 'Restricted');

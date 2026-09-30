@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 
-import { createDocument, editorOf, expect, test } from './helpers';
+import { createDocument, editorOf, expect, test, waitForSelection } from './helpers';
 import { OWNER } from './test-users';
 
 test.use({ user: OWNER });
@@ -56,7 +56,7 @@ test.describe('editor formatting', () => {
     await editor.click();
     await page.keyboard.type('Liveblocks');
     await page.keyboard.press('Shift+Home');
-    await expect.poll(() => page.evaluate(() => window.getSelection()?.toString())).toBe('Liveblocks');
+    await waitForSelection(page, 'Liveblocks');
 
     await page.keyboard.press('Control+b');
     await expect(editor.locator('.editor-text-bold')).toHaveText('Liveblocks');
@@ -71,6 +71,7 @@ test.describe('editor formatting', () => {
     await editor.getByText('Liveblocks').click();
     await page.keyboard.press('End');
     await page.keyboard.press('Shift+Home');
+    await waitForSelection(page, 'Liveblocks');
     await page.getByRole('button', { name: 'Increase font size' }).click();
     await expect(page.getByRole('textbox', { name: 'Font size' })).toHaveValue('16');
     // The text is bold by now, so it renders as <strong>, not <span>
