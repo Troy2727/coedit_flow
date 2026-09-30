@@ -11,7 +11,7 @@ import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import React from 'react';
 
-import { FloatingComposer, FloatingThreads, liveblocksConfig, LiveblocksPlugin, useEditorStatus } from '@liveblocks/react-lexical'
+import { FloatingComposer, FloatingThreads, liveblocksConfig, LiveblocksPlugin, useIsEditorReady } from '@liveblocks/react-lexical'
 import Loader from '../Loader';
 
 import FloatingToolbarPlugin from './plugins/FloatingToolbarPlugin'
@@ -28,7 +28,7 @@ function Placeholder() {
 }
 
 export function Editor({ roomId, currentUserType, isCreator }: { roomId: string, currentUserType: UserType, isCreator: boolean }) {
-  const status = useEditorStatus();
+  const ready = useIsEditorReady();
   const { threads } = useThreads();
 
   const initialConfig = liveblocksConfig({
@@ -51,7 +51,7 @@ export function Editor({ roomId, currentUserType, isCreator }: { roomId: string,
         </div>
 
         <div className="editor-wrapper flex flex-col items-center justify-start">
-          {status === 'not-loaded' || status === 'loading' ? <Loader /> : (
+          {!ready ? <Loader /> : (
             <div className="editor-inner min-h-[1100px] relative mb-5 h-fit w-full max-w-[800px] shadow-md lg:mb-10">
               <RichTextPlugin
                 contentEditable={
