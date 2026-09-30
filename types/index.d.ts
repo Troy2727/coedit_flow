@@ -10,6 +10,8 @@ declare type RoomAccesses = Record<string, AccessType>;
 
 declare type UserType = "creator" | "editor" | "viewer";
 
+declare type GeneralAccess = "restricted" | "viewer" | "editor";
+
 declare type RoomMetadata = {
   creatorId: string;
   email: string;
@@ -48,6 +50,7 @@ declare type ShareDocumentDialogProps = {
   collaborators: User[];
   creatorId: string;
   currentUserType: UserType;
+  generalAccess: GeneralAccess;
 };
 
 declare type HeaderProps = {
@@ -68,6 +71,7 @@ declare type CollaborativeRoomProps = {
   roomMetadata: RoomMetadata;
   users: User[];
   currentUserType: UserType;
+  generalAccess: GeneralAccess;
 };
 
 declare type AddDocumentBtnProps = {

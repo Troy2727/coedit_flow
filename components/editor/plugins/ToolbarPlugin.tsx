@@ -25,9 +25,19 @@ import {
   $createQuoteNode,
   $isHeadingNode,
 } from '@lexical/rich-text';
+import {
+  $isListNode,
+  INSERT_CHECK_LIST_COMMAND,
+  INSERT_ORDERED_LIST_COMMAND,
+  INSERT_UNORDERED_LIST_COMMAND,
+  REMOVE_LIST_COMMAND,
+} from '@lexical/list';
 import { $setBlocksType } from '@lexical/selection';
 import { $findMatchingParent } from '@lexical/utils';
+import { List, ListChecks, ListOrdered } from 'lucide-react';
 import React from 'react';
+import LinkButton from './LinkButton';
+import TextStyleControls from './TextStyleControls';
 import {
   useCallback,
   useEffect,
@@ -122,6 +132,20 @@ export default function ToolbarPlugin() {
     }
   }
 
+  function toggleList(type: 'bullet' | 'number' | 'check') {
+    if (activeBlock === type) {
+      return editor.dispatchCommand(REMOVE_LIST_COMMAND, undefined);
+    }
+
+    const command = {
+      bullet: INSERT_UNORDERED_LIST_COMMAND,
+      number: INSERT_ORDERED_LIST_COMMAND,
+      check: INSERT_CHECK_LIST_COMMAND,
+    }[type];
+
+    editor.dispatchCommand(command, undefined);
+  }
+
   return (
     <div className="toolbar" ref={toolbarRef}>
       <button
@@ -131,6 +155,7 @@ export default function ToolbarPlugin() {
         }}
         className="toolbar-item spaced"
         aria-label="Undo"
+        title="Undo (Ctrl+Z)"
       >
         <i className="format undo" />
       </button>
@@ -141,6 +166,7 @@ export default function ToolbarPlugin() {
         }}
         className="toolbar-item"
         aria-label="Redo"
+        title="Redo (Ctrl+Y)"
       >
         <i className="format redo" />
       </button>
@@ -151,6 +177,8 @@ export default function ToolbarPlugin() {
         className={
           'toolbar-item spaced ' + (activeBlock === 'h1' ? 'active' : '')
         }
+        aria-label="Heading 1"
+        title="Heading 1"
       >
         <i className="format h1" />
       </button>
@@ -160,6 +188,8 @@ export default function ToolbarPlugin() {
         className={
           'toolbar-item spaced ' + (activeBlock === 'h2' ? 'active' : '')
         }
+        aria-label="Heading 2"
+        title="Heading 2"
       >
         <i className="format h2" />
       </button>
@@ -169,6 +199,8 @@ export default function ToolbarPlugin() {
         className={
           'toolbar-item spaced ' + (activeBlock === 'h3' ? 'active' : '')
         }
+        aria-label="Heading 3"
+        title="Heading 3"
       >
         <i className="format h3" />
       </button>
@@ -179,6 +211,7 @@ export default function ToolbarPlugin() {
         }}
         className={'toolbar-item spaced ' + (isBold ? 'active' : '')}
         aria-label="Format Bold"
+        title="Bold (Ctrl+B)"
       >
         <i className="format bold" />
       </button>
@@ -188,6 +221,7 @@ export default function ToolbarPlugin() {
         }}
         className={'toolbar-item spaced ' + (isItalic ? 'active' : '')}
         aria-label="Format Italics"
+        title="Italic (Ctrl+I)"
       >
         <i className="format italic" />
       </button>
@@ -197,6 +231,7 @@ export default function ToolbarPlugin() {
         }}
         className={'toolbar-item spaced ' + (isUnderline ? 'active' : '')}
         aria-label="Format Underline"
+        title="Underline (Ctrl+U)"
       >
         <i className="format underline" />
       </button>
@@ -206,9 +241,13 @@ export default function ToolbarPlugin() {
         }}
         className={'toolbar-item spaced ' + (isStrikethrough ? 'active' : '')}
         aria-label="Format Strikethrough"
+        title="Strikethrough"
       >
         <i className="format strikethrough" />
       </button>
+      <Divider />
+      <TextStyleControls />
+      <LinkButton />
       <Divider />
       <button
         onClick={() => {
@@ -216,6 +255,7 @@ export default function ToolbarPlugin() {
         }}
         className="toolbar-item spaced"
         aria-label="Left Align"
+        title="Align left"
       >
         <i className="format left-align" />
       </button>
@@ -225,6 +265,7 @@ export default function ToolbarPlugin() {
         }}
         className="toolbar-item spaced"
         aria-label="Center Align"
+        title="Align center"
       >
         <i className="format center-align" />
       </button>
@@ -234,6 +275,7 @@ export default function ToolbarPlugin() {
         }}
         className="toolbar-item spaced"
         aria-label="Right Align"
+        title="Align right"
       >
         <i className="format right-align" />
       </button>
@@ -243,8 +285,34 @@ export default function ToolbarPlugin() {
         }}
         className="toolbar-item"
         aria-label="Justify Align"
+        title="Justify"
       >
         <i className="format justify-align" />
+      </button>
+      <Divider />
+      <button
+        onClick={() => toggleList('check')}
+        className={'toolbar-item spaced ' + (activeBlock === 'check' ? 'active' : '')}
+        aria-label="Checklist"
+        title="Checklist"
+      >
+        <ListChecks className="toolbar-icon" />
+      </button>
+      <button
+        onClick={() => toggleList('bullet')}
+        className={'toolbar-item spaced ' + (activeBlock === 'bullet' ? 'active' : '')}
+        aria-label="Bulleted list"
+        title="Bulleted list"
+      >
+        <List className="toolbar-icon" />
+      </button>
+      <button
+        onClick={() => toggleList('number')}
+        className={'toolbar-item ' + (activeBlock === 'number' ? 'active' : '')}
+        aria-label="Numbered list"
+        title="Numbered list"
+      >
+        <ListOrdered className="toolbar-icon" />
       </button>{' '}
     </div>
   );
@@ -280,6 +348,10 @@ function useActiveBlock() {
 
       if ($isHeadingNode(element)) {
         return element.getTag();
+      }
+
+      if ($isListNode(element)) {
+        return element.getListType();
       }
 
       return element.getType();
