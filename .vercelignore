@@ -1,0 +1,9 @@
+# Keep secrets and local build/test artifacts out of CLI deployments.
+# Vercel reads the app's keys from the project's own environment variables.
+.env
+.env*.local
+.next
+.next-e2e
+test-results
+playwright-report
+node_modules
