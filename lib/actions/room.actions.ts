@@ -5,7 +5,8 @@ import { liveblocks } from '../liveblocks';
 import { revalidatePath } from 'next/cache';
 import { getAccessType, parseStringify } from '../utils';
 import { redirect } from 'next/navigation';
-import { currentUser } from '@clerk/nextjs/server';
+import { clerkClient, currentUser } from '@clerk/nextjs/server';
+import { headers } from 'next/headers';
 
 // Server actions are public endpoints, so every action re-checks the caller server-side.
 const getCurrentUserEmail = async () => {
@@ -148,6 +149,8 @@ export const updateDocumentAccess = async ({ roomId, email, userType, updatedBy 
         },
         roomId
       })
+
+      await sendSignUpInvitation(email);
     }
 
     revalidatePath(`/documents/${roomId}`);
@@ -155,6 +158,26 @@ export const updateDocumentAccess = async ({ roomId, email, userType, updatedBy 
   } catch (error) {
     console.log(`Error happened while updating a room access: ${error}`);
   }
+}
+
+// Access is stored by email, so someone invited before signing up gets it as soon as
+// they create an account. Email them a sign-up link so they know they were invited.
+const sendSignUpInvitation = async (email: string) => {
+  const { data: existingUsers } = await clerkClient.users.getUserList({ emailAddress: [email] });
+  if (existingUsers.length > 0) return;
+
+  const origin = headers().get('origin');
+
+  await clerkClient.invitations
+    .createInvitation({
+      emailAddress: email,
+      redirectUrl: origin ? `${origin}/modern-sign-up` : undefined,
+    })
+    .catch((error) => {
+      // Clerk refuses a second invitation while one is pending, e.g. when a pending
+      // person's role changes; the first invitation is still valid.
+      console.log(`Sign-up invitation not sent: ${error}`);
+    });
 }
 
 export const removeCollaborator = async ({ roomId, email }: {roomId: string, email: string}) => {
