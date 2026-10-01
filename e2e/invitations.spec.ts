@@ -11,14 +11,19 @@ const INVITEE = 'livedocs-invitee+clerk_test@example.com';
 
 const clerk = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
 
+// Clerk's lists can briefly still include something just deleted or revoked; already gone is fine
+const ignoreGone = (error: { status?: number }) => {
+  if (error.status !== 404 && error.status !== 400) throw error;
+};
+
 /** Deletes the invitee's account and revokes their pending invitations, so every run starts fresh. */
 async function resetInvitee() {
   const { data: users } = await clerk.users.getUserList({ emailAddress: [INVITEE] });
-  for (const user of users) await clerk.users.deleteUser(user.id);
+  for (const user of users) await clerk.users.deleteUser(user.id).catch(ignoreGone);
 
   const { data: invitations } = await clerk.invitations.getInvitationList({ status: 'pending', limit: 100 });
   for (const invitation of invitations.filter((i) => i.emailAddress === INVITEE)) {
-    await clerk.invitations.revokeInvitation(invitation.id);
+    await clerk.invitations.revokeInvitation(invitation.id).catch(ignoreGone);
   }
 }
 
@@ -26,7 +31,7 @@ test.beforeEach(resetInvitee);
 test.afterEach(resetInvitee);
 
 test('sharing with someone without an account emails them an invitation that opens the document', async ({ page, browser }) => {
-  await createDocument(page);
+  const roomId = await createDocument(page);
 
   await page.getByRole('button', { name: /share/i }).first().click();
   const dialog = page.getByRole('dialog');
@@ -64,9 +69,10 @@ test('sharing with someone without an account emails them an invitation that ope
 
   // Signed in, with the shared document waiting on the home page
   await invitee.waitForURL((url) => url.pathname === '/');
-  const sharedDoc = invitee.locator('.document-list-item');
-  await expect(sharedDoc).toHaveCount(1);
-  await sharedDoc.getByRole('link').first().click();
+  // Earlier runs may have shared other documents with the same address; find this one
+  const sharedDoc = invitee.locator(`a[href="/documents/${roomId}"]`);
+  await expect(sharedDoc).toBeVisible();
+  await sharedDoc.click();
   await waitForEditor(invitee);
   await expect(invitee.getByText('View only')).toBeVisible();
 

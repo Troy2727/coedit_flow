@@ -195,7 +195,7 @@ Open [http://localhost:3001](http://localhost:3001).
 
 ```bash
 npx playwright install chromium   # first time only
-npm run test:e2e                  # builds the app and runs 25 end-to-end tests
+npm run test:e2e                  # builds the app and runs 26 end-to-end tests
 ```
 
 GitHub Actions runs the type check and the full end-to-end suite on every pull request and push to `main` (`.github/workflows/ci.yml`).

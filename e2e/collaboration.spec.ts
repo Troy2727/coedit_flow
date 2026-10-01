@@ -112,6 +112,50 @@ test('an invited editor gets in even if Liveblocks briefly denies access', async
   await guest.context.close();
 });
 
+test('comments survive the same brief denial without crashing the page', async ({ page, browser }) => {
+  const roomId = await createDocument(page);
+  await invite(page, GUEST.email, 'can edit');
+
+  // During the denial, Liveblocks also answers the comment threads request with 403.
+  // Regression: the suspense threads hook threw it and crashed the whole page.
+  const guest = await openAs(browser, GUEST);
+  let socketDenials = 0;
+  let threadDenials = 0;
+  await guest.page.routeWebSocket(/liveblocks\.io\/v\d+\?roomId=/, (ws) => {
+    if (socketDenials < 2) {
+      socketDenials++;
+      ws.close({ code: 4001, reason: 'You have no access to this room' });
+      return;
+    }
+    ws.connectToServer();
+  });
+  await guest.page.route(/liveblocks\.io\/v2\/c\/rooms\/[^/]+\/threads/, async (route) => {
+    // Only the initial load is denied; by the time the guest can post, access has arrived
+    if (route.request().method() === 'GET' && threadDenials < 2) {
+      threadDenials++;
+      await route.fulfill({ status: 403, contentType: 'application/json', body: '{"error":"FORBIDDEN"}' });
+      return;
+    }
+    await route.continue();
+  });
+
+  await guest.page.goto(`/documents/${roomId}`);
+  await waitForEditor(guest.page);
+  expect(threadDenials).toBeGreaterThan(0);
+
+  // Once access arrives, the guest can comment and the owner sees it
+  const composer = guest.page.locator('.comment-composer');
+  await composer.locator('[contenteditable="true"]').click();
+  await guest.page.keyboard.type('Comment after access arrived', { delay: 20 });
+  await composer.getByRole('button', { name: /send/i }).click();
+  await expect(page.locator('.comment-thread').getByText('Comment after access arrived')).toBeVisible();
+  // The guest's own list recovers too (Liveblocks re-fetches threads after the error)
+  await expect(guest.page.locator('.comment-thread').getByText('Comment after access arrived')).toBeVisible();
+  await expect(guest.page.getByText('Application error')).toHaveCount(0);
+
+  await guest.context.close();
+});
+
 test('a table inserted by one editor syncs to the other', async ({ page, browser }) => {
   const roomId = await createDocument(page);
   await invite(page, GUEST.email, 'can edit');
