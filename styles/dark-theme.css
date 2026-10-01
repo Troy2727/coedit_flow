@@ -329,6 +329,12 @@ body {
   border-width: 0 2px 2px 0;
 }
 
+.editor-image img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
 .editor-table {
   border-collapse: collapse;
   table-layout: fixed;

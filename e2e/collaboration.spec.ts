@@ -81,6 +81,25 @@ test('a table inserted by one editor syncs to the other', async ({ page, browser
   await guest.context.close();
 });
 
+test('an image inserted by one editor syncs to the other', async ({ page, browser, baseURL }) => {
+  const roomId = await createDocument(page);
+  await invite(page, GUEST.email, 'can edit');
+
+  const guest = await openAs(browser, GUEST);
+  await guest.page.goto(`/documents/${roomId}`);
+  await waitForEditor(guest.page);
+
+  await editorOf(page).click();
+  await page.getByRole('button', { name: 'Insert image' }).click();
+  await page.getByLabel('Image URL').fill(`${baseURL}/assets/images/logo.png`);
+  await page.getByLabel('Image description').fill('Shared logo');
+  await page.getByRole('button', { name: 'Insert', exact: true }).click();
+
+  await expect(editorOf(guest.page).getByRole('img', { name: 'Shared logo' })).toBeVisible();
+
+  await guest.context.close();
+});
+
 test('invited viewers get a read-only document', async ({ page, browser }) => {
   const roomId = await createDocument(page);
   await invite(page, GUEST.email, 'can view');
