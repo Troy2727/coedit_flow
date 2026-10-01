@@ -21,6 +21,9 @@ jobs:
       - run: npx tsc --noEmit
 
   e2e:
+    # Pull requests only: the suite runs against the real Liveblocks project (free
+    # tier), and a merge to main was already tested in its PR
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     needs: typecheck
     # Every run shares the same two Clerk test users, so never run two at once
