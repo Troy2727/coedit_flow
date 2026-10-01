@@ -68,7 +68,8 @@ export function Editor({ roomId, currentUserType, isCreator, title }: { roomId: 
     <LexicalComposer initialConfig={initialConfig}>
       <div className="editor-container size-full">
         <div className="toolbar-wrapper flex min-w-full justify-between">
-          <ToolbarPlugin />
+          {/* Viewers can't edit; toolbar buttons would only change their local copy */}
+          {currentUserType === 'editor' ? <ToolbarPlugin /> : <div />}
           <div className="flex items-center gap-1">
             <WordCount />
             <ExportMenu title={title} />
