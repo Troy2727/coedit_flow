@@ -61,6 +61,30 @@ test('two editors see each other’s changes and presence in real time', async (
   await guest.context.close();
 });
 
+test('a slow collaborator joining later gets the existing content and live edits', async ({ page, browser }) => {
+  const roomId = await createDocument(page);
+  await invite(page, GUEST.email, 'can edit');
+
+  await editorOf(page).click();
+  await page.keyboard.type('Written before Gabe joined.', { delay: 20 });
+
+  // A slow CPU makes React mount the editor slowly while Liveblocks syncs at
+  // full speed. Regression: the initial sync used to land before Lexical was
+  // listening, leaving the guest's editor detached from the shared document.
+  const guest = await openAs(browser, GUEST);
+  const cdp = await guest.context.newCDPSession(guest.page);
+  await cdp.send('Emulation.setCPUThrottlingRate', { rate: 6 });
+  await guest.page.goto(`/documents/${roomId}`);
+  await waitForEditor(guest.page);
+
+  await expect(editorOf(guest.page)).toContainText('Written before Gabe joined.');
+
+  await page.keyboard.type(' And after.', { delay: 20 });
+  await expect(editorOf(guest.page)).toContainText('Written before Gabe joined. And after.');
+
+  await guest.context.close();
+});
+
 test('a table inserted by one editor syncs to the other', async ({ page, browser }) => {
   const roomId = await createDocument(page);
   await invite(page, GUEST.email, 'can edit');
