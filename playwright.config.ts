@@ -16,7 +16,8 @@ export default defineConfig({
   workers: 1,
   fullyParallel: false,
   retries: process.env.CI ? 1 : 0,
-  timeout: 90_000,
+  // Room for waitForEditor's two minutes when Liveblocks is slow to accept a new invite
+  timeout: 180_000,
   expect: { timeout: 15_000 },
   reporter: [['list'], ['html', { open: 'never' }]],
   globalSetup: './e2e/global-setup.ts',
@@ -34,5 +35,8 @@ export default defineConfig({
     env: { NEXT_DIST_DIR: '.next-e2e' },
     reuseExistingServer: !process.env.CI,
     timeout: 600_000,
+    // Show the app's server logs in the test output, so server action errors
+    // behind a failed test (e.g. a version snapshot) are visible in CI
+    stdout: 'pipe',
   },
 });
