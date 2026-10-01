@@ -56,7 +56,7 @@
 - Font size, text color, and highlight color
 - Bulleted, numbered, and checklist lists (Tab to nest)
 - Tables with insert/delete row and column controls
-- Images by URL with alt text (only `http(s)` sources render)
+- Images by URL with alt text (only `http(s)` sources render), or uploaded from your computer (PNG, JPEG, GIF, WebP up to 5 MB) into Liveblocks file storage. Each viewer gets a short-lived signed URL, so only people with access to the document can load them
 - Links with `Ctrl+K`, auto-linking of typed URLs, and blocking of unsafe (`javascript:`) links
 - Markdown shortcuts: `#` headings, `-` bullets, `1.` numbers, `[]` checkboxes, `**bold**`, `[text](url)`
 - Every toolbar button shows its name and keyboard shortcut on hover
@@ -196,7 +196,7 @@ Open [http://localhost:3001](http://localhost:3001).
 
 ```bash
 npx playwright install chromium   # first time only
-npm run test:e2e                  # builds the app and runs 29 end-to-end tests
+npm run test:e2e                  # builds the app and runs 31 end-to-end tests
 ```
 
 GitHub Actions runs the type check and the full end-to-end suite on every pull request and push to `main` (`.github/workflows/ci.yml`).
@@ -226,7 +226,6 @@ e2e/                              Playwright end-to-end tests
 
 ## 🗺️ Roadmap
 
-- Image uploads (images can currently be added by URL)
 - Suggesting mode: typing itself becomes suggestions (building on the existing suggest-edit nodes and accept/reject)
 - AI writing assistant (improve, summarize, translate a selection)
 - Commenter role and ownership transfer

@@ -143,6 +143,22 @@ test.describe('editor formatting', () => {
     await expect.poll(() => image.evaluate((img: HTMLImageElement) => img.naturalWidth)).toBeGreaterThan(0);
   });
 
+  test('uploads an image from the computer and refuses non-images', async ({ page }) => {
+    await createDocument(page);
+    const editor = editorOf(page);
+    await editor.click();
+
+    await page.getByRole('button', { name: 'Insert image' }).click();
+    await page.getByLabel('Upload image').setInputFiles({ name: 'notes.txt', mimeType: 'text/plain', buffer: Buffer.from('not an image') });
+    await expect(page.getByText('Use a PNG, JPEG, GIF, or WebP image.')).toBeVisible();
+
+    await page.getByLabel('Upload image').setInputFiles('public/assets/images/logo.png');
+    const image = editor.getByRole('img', { name: 'logo.png' });
+    await expect(image).toBeVisible({ timeout: 30_000 });
+    // The browser actually loaded the uploaded file
+    await expect.poll(() => image.evaluate((img: HTMLImageElement) => img.naturalWidth)).toBeGreaterThan(0);
+  });
+
   test('every toolbar button has a hover tooltip', async ({ page }) => {
     await createDocument(page);
 
