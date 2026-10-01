@@ -32,7 +32,9 @@ export default defineConfig({
   webServer: {
     command: `npm run build && npm run start -- -p ${PORT}`,
     url: `http://localhost:${PORT}`,
-    env: { NEXT_DIST_DIR: '.next-e2e' },
+    // Tests invite people constantly; don't spend the Liveblocks free tier's
+    // monthly notifications on them (see updateDocumentAccess)
+    env: { NEXT_DIST_DIR: '.next-e2e', SKIP_ACCESS_NOTIFICATIONS: 'true' },
     reuseExistingServer: !process.env.CI,
     timeout: 600_000,
     // Show the app's server logs in the test output, so server action errors

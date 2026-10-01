@@ -139,19 +139,23 @@ export const updateDocumentAccess = async ({ roomId, email, userType, updatedBy 
       // Access is already granted. Telling the person about it is best-effort, so a
       // failure here (e.g. Liveblocks refusing notifications with 403) must not make
       // the invite look failed or skip the email invitation.
-      await liveblocks.triggerInboxNotification({
-        userId: email,
-        kind: '$documentAccess',
-        subjectId: notificationId,
-        activityData: {
-          userType,
-          title: `You have been granted ${userType} access to the document by ${updatedBy.name}`,
-          updatedBy: updatedBy.name,
-          avatar: updatedBy.avatar,
-          email: updatedBy.email
-        },
-        roomId
-      }).catch((error) => console.log(`Access notification not sent: ${error}`));
+      // The e2e test server turns notifications off: its constant invites used up the
+      // Liveblocks free tier's monthly notifications, leaving none for real users.
+      if (process.env.SKIP_ACCESS_NOTIFICATIONS !== 'true') {
+        await liveblocks.triggerInboxNotification({
+          userId: email,
+          kind: '$documentAccess',
+          subjectId: notificationId,
+          activityData: {
+            userType,
+            title: `You have been granted ${userType} access to the document by ${updatedBy.name}`,
+            updatedBy: updatedBy.name,
+            avatar: updatedBy.avatar,
+            email: updatedBy.email
+          },
+          roomId
+        }).catch((error) => console.log(`Access notification not sent: ${error}`));
+      }
 
       await sendSignUpInvitation(email).catch((error) => console.log(`Sign-up invitation not sent: ${error}`));
     }
