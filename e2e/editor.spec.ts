@@ -121,6 +121,27 @@ test.describe('editor formatting', () => {
     await expect(editor.locator('table')).toHaveCount(0);
   });
 
+  test('inserts an image from a URL and rejects non-web URLs', async ({ page, baseURL }) => {
+    await createDocument(page);
+    const editor = editorOf(page);
+
+    await editor.click();
+    await page.getByRole('button', { name: 'Insert image' }).click();
+    const insert = page.getByRole('button', { name: 'Insert', exact: true });
+
+    await page.getByLabel('Image URL').fill('javascript:alert(1)');
+    await expect(insert).toBeDisabled();
+
+    await page.getByLabel('Image URL').fill(`${baseURL}/assets/images/logo.png`);
+    await page.getByLabel('Image description').fill('LiveDocs logo');
+    await insert.click();
+
+    const image = editor.getByRole('img', { name: 'LiveDocs logo' });
+    await expect(image).toBeVisible();
+    // The browser actually loaded it
+    await expect.poll(() => image.evaluate((img: HTMLImageElement) => img.naturalWidth)).toBeGreaterThan(0);
+  });
+
   test('every toolbar button has a hover tooltip', async ({ page }) => {
     await createDocument(page);
 

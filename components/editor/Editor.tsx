@@ -20,6 +20,7 @@ import { ListItemNode, ListNode } from '@lexical/list';
 import { AutoLinkNode, LinkNode } from '@lexical/link';
 import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
+import { ImageNode } from './nodes/ImageNode';
 import { History } from 'lucide-react';
 import React, { useState } from 'react';
 import { MARKDOWN_TRANSFORMERS } from './markdownTransformers';
@@ -52,7 +53,7 @@ export function Editor({ roomId, currentUserType, isCreator, title }: { roomId: 
 
   const initialConfig = liveblocksConfig({
     namespace: 'Editor',
-    nodes: [HeadingNode, QuoteNode, ListNode, ListItemNode, LinkNode, AutoLinkNode, TableNode, TableRowNode, TableCellNode],
+    nodes: [HeadingNode, QuoteNode, ListNode, ListItemNode, LinkNode, AutoLinkNode, TableNode, TableRowNode, TableCellNode, ImageNode],
     onError: (error: Error) => {
       console.error(error);
       throw error;
