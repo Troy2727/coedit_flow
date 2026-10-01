@@ -16,11 +16,12 @@ const Document = async ({ params: { id } }: SearchParamProps) => {
   if(!room) redirect('/');
 
   const userIds = Object.keys(room.usersAccesses);
-  const users = await getClerkUsers({ userIds });
+  const users: (User | undefined)[] = (await getClerkUsers({ userIds })) ?? [];
 
-  const usersData = users.map((user: User) => ({
-    ...user,
-    userType: room.usersAccesses[user.email]?.includes('room:write')
+  // Someone invited before signing up has no Clerk user yet; list them by email
+  const usersData: User[] = userIds.map((email, i) => ({
+    ...(users[i] ?? { id: email, name: 'Pending invite', email, avatar: '/assets/icons/user.svg', color: '' }),
+    userType: room.usersAccesses[email]?.includes('room:write')
       ? 'editor'
       : 'viewer'
   }))
