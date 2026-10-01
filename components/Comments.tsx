@@ -4,6 +4,7 @@ import { Composer, Thread } from '@liveblocks/react-ui';
 // Not the suspense version, which would crash the page on a temporary 403 (see Editor.tsx)
 import { useThreads } from '@liveblocks/react';
 import React from 'react'
+import SuggestionsPanel from './editor/plugins/SuggestionsPanel';
 
 const ThreadWrapper = ({ thread }: ThreadWrapperProps) => {
   const isActive = useIsThreadActive(thread.id);
@@ -20,11 +21,13 @@ const ThreadWrapper = ({ thread }: ThreadWrapperProps) => {
   )
 }
 
-const Comments = () => {
+// The right-hand column: pending suggestions, then comments
+const Comments = ({ canResolveSuggestions }: { canResolveSuggestions: boolean }) => {
   const threads = useThreads().threads ?? [];
 
   return (
     <div className="comments-container">
+      <SuggestionsPanel canResolve={canResolveSuggestions} />
       <Composer className="comment-composer" />
 
       {threads.map((thread) => (
