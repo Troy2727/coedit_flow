@@ -85,6 +85,33 @@ test('a slow collaborator joining later gets the existing content and live edits
   await guest.context.close();
 });
 
+test('an invited editor gets in even if Liveblocks briefly denies access', async ({ page, browser }) => {
+  const roomId = await createDocument(page);
+  await invite(page, GUEST.email, 'can edit');
+
+  // In production, Liveblocks' realtime servers can take up to about a minute to see
+  // a new invite and close the connection with 4001 meanwhile. Simulate two denials.
+  const guest = await openAs(browser, GUEST);
+  let denials = 0;
+  await guest.page.routeWebSocket(/liveblocks\.io\/v\d+\?roomId=/, (ws) => {
+    if (denials < 2) {
+      denials++;
+      ws.close({ code: 4001, reason: 'You have no access to this room' });
+      return;
+    }
+    ws.connectToServer();
+  });
+  await guest.page.goto(`/documents/${roomId}`);
+  await waitForEditor(guest.page);
+  expect(denials).toBe(2);
+
+  await editorOf(page).click();
+  await page.keyboard.type('Welcome, Gabe.', { delay: 20 });
+  await expect(editorOf(guest.page)).toContainText('Welcome, Gabe.');
+
+  await guest.context.close();
+});
+
 test('a table inserted by one editor syncs to the other', async ({ page, browser }) => {
   const roomId = await createDocument(page);
   await invite(page, GUEST.email, 'can edit');
