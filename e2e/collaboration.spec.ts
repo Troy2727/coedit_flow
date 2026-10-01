@@ -50,12 +50,12 @@ test('two editors see each other’s changes and presence in real time', async (
   await expect(guest.page.getByAltText(`${OWNER.firstName} ${OWNER.lastName}`)).toBeVisible();
 
   await editorOf(page).click();
-  await page.keyboard.type('Hello from Olivia.');
+  await page.keyboard.type('Hello from Olivia.', { delay: 20 });
   await expect(editorOf(guest.page)).toContainText('Hello from Olivia.');
 
   await editorOf(guest.page).click();
   await guest.page.keyboard.press('Control+End');
-  await guest.page.keyboard.type(' Hi from Gabe!');
+  await guest.page.keyboard.type(' Hi from Gabe!', { delay: 20 });
   await expect(editorOf(page)).toContainText('Hello from Olivia. Hi from Gabe!');
 
   await guest.context.close();
@@ -251,7 +251,7 @@ test('version history saves, previews, and restores a version', async ({ page })
   const editor = editorOf(page);
 
   await editor.click();
-  await page.keyboard.type('Version one text');
+  await page.keyboard.type('Version one text', { delay: 20 });
 
   await page.getByRole('button', { name: 'Version history' }).click();
   const dialog = page.getByRole('dialog', { name: 'Version history' });
@@ -266,7 +266,7 @@ test('version history saves, previews, and restores a version', async ({ page })
 
   await editor.click();
   await page.keyboard.press('Control+End');
-  await page.keyboard.type(' plus later edits');
+  await page.keyboard.type(' plus later edits', { delay: 20 });
   await expect(editor).toContainText('Version one text plus later edits');
 
   await page.getByRole('button', { name: 'Version history' }).click();
