@@ -3,6 +3,9 @@
   <br />
   <br />
   <p>
+    <a href="https://github.com/Troy2727/coedit_flow/actions/workflows/ci.yml"><img src="https://github.com/Troy2727/coedit_flow/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
+  </p>
+  <p>
     <img src="https://img.shields.io/badge/-Next.js_14-black?style=for-the-badge&logoColor=white&logo=nextdotjs&color=000000" alt="Next.js" />
     <img src="https://img.shields.io/badge/-TypeScript-black?style=for-the-badge&logoColor=white&logo=typescript&color=3178C6" alt="TypeScript" />
     <img src="https://img.shields.io/badge/-Tailwind_CSS-black?style=for-the-badge&logoColor=white&logo=tailwindcss&color=06B6D4" alt="Tailwind CSS" />
@@ -52,6 +55,8 @@
 - Headings, bold, italic, underline, strikethrough, and text alignment
 - Font size, text color, and highlight color
 - Bulleted, numbered, and checklist lists (Tab to nest)
+- Tables with insert/delete row and column controls
+- Images by URL with alt text (only `http(s)` sources render)
 - Links with `Ctrl+K`, auto-linking of typed URLs, and blocking of unsafe (`javascript:`) links
 - Markdown shortcuts: `#` headings, `-` bullets, `1.` numbers, `[]` checkboxes, `**bold**`, `[text](url)`
 - Every toolbar button shows its name and keyboard shortcut on hover
@@ -136,6 +141,7 @@ flowchart LR
   - a system clock drifting 6 seconds, which made Clerk reject fresh session tokens
   - a mismatch between the Liveblocks SDK's TypeScript types and its API responses
   - a development-only React Strict Mode double-mount that detached a collaborator's editor. The suite now runs against a production build.
+- **A sync race found by CI, fixed at the root.** On GitHub's runners, a collaborator who joined a document sometimes got a blank editor that threw `could not find element node` on the next remote edit. Lexical loads the shared Yjs document only through an `observeDeep` listener, which it registers after creating the provider. The Liveblocks provider ignores `connect()` and syncs immediately, so a fast initial sync could land before Lexical was listening. A regression test reproduces it by throttling the joining browser's CPU (failed 3/3 before the fix). A small `patch-package` patch makes Lexical load any state already in the document once it starts listening.
 
 ---
 
@@ -187,8 +193,10 @@ Open [http://localhost:3001](http://localhost:3001).
 
 ```bash
 npx playwright install chromium   # first time only
-npm run test:e2e                  # builds the app and runs 16 end-to-end tests
+npm run test:e2e                  # builds the app and runs 21 end-to-end tests
 ```
+
+GitHub Actions runs the type check and the full end-to-end suite on every pull request and push to `main` (`.github/workflows/ci.yml`).
 
 The tests build the app for production and serve it on port 3002, so they can run while `npm run dev` is using 3001. They create two Clerk test users (`+clerk_test` addresses, so no real email is ever sent) and delete every document they create when they finish.
 
@@ -215,7 +223,7 @@ e2e/                              Playwright end-to-end tests
 
 ## 🗺️ Roadmap
 
-- Images and tables in documents
+- Image uploads (images can currently be added by URL)
 - Suggesting mode (tracked changes)
 - AI writing assistant (improve, summarize, translate a selection)
 - Commenter role and ownership transfer

@@ -32,6 +32,11 @@ export default {
   placeholder: 'editor-placeholder',
   quote: 'editor-quote',
   rtl: 'rtl',
+  table: 'editor-table',
+  tableCell: 'editor-table-cell',
+  tableCellHeader: 'editor-table-cell-header',
+  tableSelection: 'editor-table-selection',
+  tableCellSelected: 'editor-table-cell-selected',
   text: {
     bold: 'editor-text-bold',
     code: 'editor-text-code',

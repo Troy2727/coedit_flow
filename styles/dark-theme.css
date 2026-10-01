@@ -329,6 +329,40 @@ body {
   border-width: 0 2px 2px 0;
 }
 
+.editor-image img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+.editor-table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+  margin: 8px 0 16px;
+}
+
+.editor-table-cell {
+  border: 1px solid #27344d;
+  padding: 6px 8px;
+  min-width: 75px;
+  vertical-align: top;
+  text-align: left;
+}
+
+.editor-table-cell-header {
+  background-color: #0f1c34;
+  font-weight: 600;
+}
+
+.editor-table-cell-selected {
+  background-color: rgba(51, 113, 255, 0.25);
+}
+
+.editor-table-selection *::selection {
+  background-color: transparent;
+}
+
 /* lucide icons in the toolbar, styled like the existing i.format icons */
 .toolbar .toolbar-icon {
   width: 18px;
