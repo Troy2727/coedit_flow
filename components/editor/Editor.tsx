@@ -18,6 +18,8 @@ import { ClickableLinkPlugin } from '@lexical/react/LexicalClickableLinkPlugin';
 import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin';
 import { ListItemNode, ListNode } from '@lexical/list';
 import { AutoLinkNode, LinkNode } from '@lexical/link';
+import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
+import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 import { History } from 'lucide-react';
 import React, { useState } from 'react';
 import { MARKDOWN_TRANSFORMERS } from './markdownTransformers';
@@ -50,7 +52,7 @@ export function Editor({ roomId, currentUserType, isCreator, title }: { roomId: 
 
   const initialConfig = liveblocksConfig({
     namespace: 'Editor',
-    nodes: [HeadingNode, QuoteNode, ListNode, ListItemNode, LinkNode, AutoLinkNode],
+    nodes: [HeadingNode, QuoteNode, ListNode, ListItemNode, LinkNode, AutoLinkNode, TableNode, TableRowNode, TableCellNode],
     onError: (error: Error) => {
       console.error(error);
       throw error;
@@ -100,6 +102,7 @@ export function Editor({ roomId, currentUserType, isCreator, title }: { roomId: 
               <ListPlugin />
               <CheckListPlugin />
               <TabIndentationPlugin />
+              <TablePlugin />
               <LinkPlugin validateUrl={validateUrl} />
               <AutoLinkPlugin matchers={AUTO_LINK_MATCHERS} />
               {/* Editors follow links from the link popover; viewers can click them directly */}

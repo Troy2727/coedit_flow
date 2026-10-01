@@ -61,6 +61,26 @@ test('two editors see each other’s changes and presence in real time', async (
   await guest.context.close();
 });
 
+test('a table inserted by one editor syncs to the other', async ({ page, browser }) => {
+  const roomId = await createDocument(page);
+  await invite(page, GUEST.email, 'can edit');
+
+  const guest = await openAs(browser, GUEST);
+  await guest.page.goto(`/documents/${roomId}`);
+  await waitForEditor(guest.page);
+
+  await editorOf(page).click();
+  await page.getByRole('button', { name: 'Table', exact: true }).click();
+  await page.getByRole('button', { name: 'Insert 3 × 3 table' }).click();
+  await expect(editorOf(guest.page).locator('table tr')).toHaveCount(3);
+
+  await editorOf(guest.page).locator('table td').first().click();
+  await guest.page.keyboard.type('from Gabe', { delay: 20 });
+  await expect(editorOf(page).locator('table td').first()).toHaveText('from Gabe');
+
+  await guest.context.close();
+});
+
 test('invited viewers get a read-only document', async ({ page, browser }) => {
   const roomId = await createDocument(page);
   await invite(page, GUEST.email, 'can view');
