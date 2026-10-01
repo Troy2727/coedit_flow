@@ -136,6 +136,9 @@ export const updateDocumentAccess = async ({ roomId, email, userType, updatedBy 
     if(room) {
       const notificationId = nanoid();
 
+      // Access is already granted. Telling the person about it is best-effort, so a
+      // failure here (e.g. Liveblocks refusing notifications with 403) must not make
+      // the invite look failed or skip the email invitation.
       await liveblocks.triggerInboxNotification({
         userId: email,
         kind: '$documentAccess',
@@ -148,9 +151,9 @@ export const updateDocumentAccess = async ({ roomId, email, userType, updatedBy 
           email: updatedBy.email
         },
         roomId
-      })
+      }).catch((error) => console.log(`Access notification not sent: ${error}`));
 
-      await sendSignUpInvitation(email);
+      await sendSignUpInvitation(email).catch((error) => console.log(`Sign-up invitation not sent: ${error}`));
     }
 
     revalidatePath(`/documents/${roomId}`);
