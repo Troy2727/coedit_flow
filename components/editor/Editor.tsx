@@ -21,6 +21,7 @@ import { AutoLinkNode, LinkNode } from '@lexical/link';
 import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 import { ImageNode } from './nodes/ImageNode';
+import { SuggestionNode } from './nodes/SuggestionNode';
 import { History } from 'lucide-react';
 import React, { useState } from 'react';
 import { MARKDOWN_TRANSFORMERS } from './markdownTransformers';
@@ -55,7 +56,7 @@ export function Editor({ roomId, currentUserType, isCreator, title }: { roomId: 
 
   const initialConfig = liveblocksConfig({
     namespace: 'Editor',
-    nodes: [HeadingNode, QuoteNode, ListNode, ListItemNode, LinkNode, AutoLinkNode, TableNode, TableRowNode, TableCellNode, ImageNode],
+    nodes: [HeadingNode, QuoteNode, ListNode, ListItemNode, LinkNode, AutoLinkNode, TableNode, TableRowNode, TableCellNode, ImageNode, SuggestionNode],
     onError: (error: Error) => {
       console.error(error);
       throw error;
@@ -119,7 +120,7 @@ export function Editor({ roomId, currentUserType, isCreator, title }: { roomId: 
           <LiveblocksPlugin>
             <FloatingComposer className="w-[350px]" />
             <FloatingThreads threads={threads} />
-            <Comments />
+            <Comments canResolveSuggestions={currentUserType === 'editor'} />
             {currentUserType === 'editor' && (
               <VersionHistory roomId={roomId} open={historyOpen} onOpenChange={setHistoryOpen} />
             )}

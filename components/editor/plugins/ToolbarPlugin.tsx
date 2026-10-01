@@ -38,6 +38,7 @@ import { List, ListChecks, ListOrdered } from 'lucide-react';
 import React from 'react';
 import LinkButton from './LinkButton';
 import ImageButton from './ImageButton';
+import SuggestEditButton from './SuggestEditButton';
 import TextStyleControls from './TextStyleControls';
 import TableControls from './TableControls';
 import {
@@ -251,6 +252,7 @@ export default function ToolbarPlugin() {
       <TextStyleControls />
       <LinkButton />
       <ImageButton />
+      <SuggestEditButton />
       <Divider />
       <button
         onClick={() => {

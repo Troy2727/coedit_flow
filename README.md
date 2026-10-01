@@ -61,7 +61,8 @@
 - Markdown shortcuts: `#` headings, `-` bullets, `1.` numbers, `[]` checkboxes, `**bold**`, `[text](url)`
 - Every toolbar button shows its name and keyboard shortcut on hover
 
-**💬 Comments & notifications**
+**💬 Comments, suggestions & notifications**
+- Suggest edits: propose replacing, deleting, or adding text; it shows struck through / underlined with the author, and anyone who can edit accepts or rejects it from the Suggestions panel
 - Comment on any selected text, with threaded replies and resolving
 - `@mentions` of collaborators
 - In-app notification inbox for mentions, replies, and documents shared with you
@@ -195,7 +196,7 @@ Open [http://localhost:3001](http://localhost:3001).
 
 ```bash
 npx playwright install chromium   # first time only
-npm run test:e2e                  # builds the app and runs 26 end-to-end tests
+npm run test:e2e                  # builds the app and runs 29 end-to-end tests
 ```
 
 GitHub Actions runs the type check and the full end-to-end suite on every pull request and push to `main` (`.github/workflows/ci.yml`).
@@ -226,7 +227,7 @@ e2e/                              Playwright end-to-end tests
 ## 🗺️ Roadmap
 
 - Image uploads (images can currently be added by URL)
-- Suggesting mode (tracked changes)
+- Suggesting mode: typing itself becomes suggestions (building on the existing suggest-edit nodes and accept/reject)
 - AI writing assistant (improve, summarize, translate a selection)
 - Commenter role and ownership transfer
 
