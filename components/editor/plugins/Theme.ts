@@ -32,6 +32,8 @@ export default {
   placeholder: 'editor-placeholder',
   quote: 'editor-quote',
   rtl: 'rtl',
+  suggestionInsert: 'editor-suggestion-insert',
+  suggestionDelete: 'editor-suggestion-delete',
   table: 'editor-table',
   tableCell: 'editor-table-cell',
   tableCellHeader: 'editor-table-cell-header',
