@@ -1,7 +1,8 @@
 import { cn } from '@/lib/utils';
 import { useIsThreadActive } from '@liveblocks/react-lexical';
 import { Composer, Thread } from '@liveblocks/react-ui';
-import { useThreads } from '@liveblocks/react/suspense';
+// Not the suspense version, which would crash the page on a temporary 403 (see Editor.tsx)
+import { useThreads } from '@liveblocks/react';
 import React from 'react'
 
 const ThreadWrapper = ({ thread }: ThreadWrapperProps) => {
@@ -20,7 +21,7 @@ const ThreadWrapper = ({ thread }: ThreadWrapperProps) => {
 }
 
 const Comments = () => {
-  const { threads } = useThreads();
+  const threads = useThreads().threads ?? [];
 
   return (
     <div className="comments-container">

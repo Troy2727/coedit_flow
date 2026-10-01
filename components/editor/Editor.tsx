@@ -33,7 +33,9 @@ import FloatingToolbarPlugin from './plugins/FloatingToolbarPlugin'
 import DocumentOutline from './plugins/DocumentOutline';
 import WordCount from './plugins/WordCount';
 import ExportMenu from './plugins/ExportMenu';
-import { useThreads } from '@liveblocks/react/suspense';
+// Not the suspense version: that one throws if Liveblocks briefly denies a newly
+// invited user (403), crashing the page. This one reports it and Liveblocks retries.
+import { useThreads } from '@liveblocks/react';
 import Comments from '../Comments';
 import { DeleteModal } from '../DeleteModal';
 import VersionHistory from '../VersionHistory';
@@ -48,7 +50,7 @@ function Placeholder() {
 
 export function Editor({ roomId, currentUserType, isCreator, title }: { roomId: string, currentUserType: UserType, isCreator: boolean, title: string }) {
   const ready = useIsEditorReady();
-  const { threads } = useThreads();
+  const threads = useThreads().threads ?? [];
   const [historyOpen, setHistoryOpen] = useState(false);
 
   const initialConfig = liveblocksConfig({
