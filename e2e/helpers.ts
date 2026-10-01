@@ -40,11 +40,12 @@ export { expect };
 export const editorOf = (page: Page) => page.locator('.editor-input');
 
 /**
- * Waits for the editor after opening a document. Loading the room from Liveblocks'
- * servers occasionally takes longer than the default 15s assertion timeout.
+ * Waits for the editor after opening a document. Right after an invite, Liveblocks'
+ * realtime servers can take up to about a minute to accept the new user, while the
+ * app keeps retrying (RoomAccessRetry, up to two minutes); wait as long as a user would.
  */
 export async function waitForEditor(page: Page) {
-  await expect(editorOf(page)).toBeVisible({ timeout: 45_000 });
+  await expect(editorOf(page)).toBeVisible({ timeout: 120_000 });
 }
 
 /**
