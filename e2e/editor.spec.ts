@@ -105,7 +105,8 @@ test.describe('editor formatting', () => {
     await expect(editor.locator('table tr').first().locator('th, td')).toHaveCount(3);
 
     await editor.locator('table td').first().click();
-    await page.keyboard.type('cell text');
+    // Zero-delay typing can drop characters in the Lexical/Yjs sync
+    await page.keyboard.type('cell text', { delay: 20 });
     await expect(editor.locator('table td').first()).toHaveText('cell text');
 
     await table.click();
