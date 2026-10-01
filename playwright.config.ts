@@ -35,5 +35,8 @@ export default defineConfig({
     env: { NEXT_DIST_DIR: '.next-e2e' },
     reuseExistingServer: !process.env.CI,
     timeout: 600_000,
+    // Show the app's server logs in the test output, so server action errors
+    // behind a failed test (e.g. a version snapshot) are visible in CI
+    stdout: 'pipe',
   },
 });
