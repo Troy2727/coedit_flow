@@ -222,6 +222,10 @@ test('invited viewers get a read-only document', async ({ page, browser }) => {
   await expect(editorOf(guest.page)).toHaveAttribute('contenteditable', 'false');
   await expect(guest.page.getByRole('button', { name: 'Version history' })).toHaveCount(0);
   await expect(guest.page.getByAltText('delete')).toHaveCount(0);
+  // No editing toolbar: its buttons would only change the viewer's local copy
+  await expect(guest.page.getByRole('button', { name: 'Insert image' })).toHaveCount(0);
+  await expect(guest.page.getByRole('button', { name: 'Suggest edit' })).toHaveCount(0);
+  await expect(guest.page.getByRole('button', { name: 'Download' })).toBeVisible();
 
   await guest.context.close();
 });
