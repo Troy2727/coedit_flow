@@ -92,6 +92,35 @@ test.describe('editor formatting', () => {
     await expect(page.getByRole('button', { name: 'Apply' })).toBeDisabled();
   });
 
+  test('inserts a table and adds and removes rows and columns', async ({ page }) => {
+    await createDocument(page);
+    const editor = editorOf(page);
+    const table = page.getByRole('button', { name: 'Table', exact: true });
+
+    await editor.click();
+    await table.click();
+    await page.getByRole('button', { name: 'Insert 3 × 3 table' }).click();
+
+    await expect(editor.locator('table tr')).toHaveCount(3);
+    await expect(editor.locator('table tr').first().locator('th, td')).toHaveCount(3);
+
+    await editor.locator('table td').first().click();
+    await page.keyboard.type('cell text');
+    await expect(editor.locator('table td').first()).toHaveText('cell text');
+
+    await table.click();
+    await page.getByRole('button', { name: 'Insert row below' }).click();
+    await expect(editor.locator('table tr')).toHaveCount(4);
+
+    await table.click();
+    await page.getByRole('button', { name: 'Insert column right' }).click();
+    await expect(editor.locator('table tr').first().locator('th, td')).toHaveCount(4);
+
+    await table.click();
+    await page.getByRole('button', { name: 'Delete table' }).click();
+    await expect(editor.locator('table')).toHaveCount(0);
+  });
+
   test('every toolbar button has a hover tooltip', async ({ page }) => {
     await createDocument(page);
 
