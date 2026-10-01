@@ -151,6 +151,21 @@ test('an image inserted by one editor syncs to the other', async ({ page, browse
   await guest.context.close();
 });
 
+test('sharing with someone who has no account yet keeps the document working', async ({ page }) => {
+  // Regression: an invited email without a Clerk account crashed the document page
+  const pending = 'livedocs-pending+clerk_test@example.com';
+  await createDocument(page);
+  await invite(page, pending, 'can view');
+
+  await page.reload();
+  await waitForEditor(page);
+
+  await page.getByRole('button', { name: /share/i }).first().click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog.getByText(pending)).toBeVisible();
+  await expect(dialog.getByText('Pending invite')).toBeVisible();
+});
+
 test('invited viewers get a read-only document', async ({ page, browser }) => {
   const roomId = await createDocument(page);
   await invite(page, GUEST.email, 'can view');
