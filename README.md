@@ -199,7 +199,7 @@ npx playwright install chromium   # first time only
 npm run test:e2e                  # builds the app and runs 31 end-to-end tests
 ```
 
-GitHub Actions runs the type check and the full end-to-end suite on every pull request and push to `main` (`.github/workflows/ci.yml`).
+GitHub Actions runs the type check and the full end-to-end suite on every pull request, and the type check again on merges to `main` (`.github/workflows/ci.yml`).
 
 The tests build the app for production and serve it on port 3002, so they can run while `npm run dev` is using 3001. They create two Clerk test users (`+clerk_test` addresses, so no real email is ever sent) and delete every document they create when they finish.
 
