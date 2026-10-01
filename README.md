@@ -68,6 +68,7 @@
 
 **🔗 Sharing & permissions**
 - Invite people by email as **viewers** (read-only) or **editors**
+- People without an account get an emailed invitation; signing up through it opens the shared document (they show as "Pending invite" until then)
 - "**Anyone with the link** can view / edit", plus Copy link
 - Only the owner can delete a document; the owner's access can't be removed
 
@@ -194,7 +195,7 @@ Open [http://localhost:3001](http://localhost:3001).
 
 ```bash
 npx playwright install chromium   # first time only
-npm run test:e2e                  # builds the app and runs 22 end-to-end tests
+npm run test:e2e                  # builds the app and runs 25 end-to-end tests
 ```
 
 GitHub Actions runs the type check and the full end-to-end suite on every pull request and push to `main` (`.github/workflows/ci.yml`).
