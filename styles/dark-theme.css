@@ -329,6 +329,41 @@ body {
   border-width: 0 2px 2px 0;
 }
 
+.editor-suggestion-insert {
+  color: #86efac;
+  background-color: rgba(34, 197, 94, 0.15);
+  text-decoration: underline;
+  text-decoration-color: #22c55e;
+}
+
+.editor-suggestion-delete {
+  color: #fca5a5;
+  background-color: rgba(239, 68, 68, 0.12);
+  text-decoration: line-through;
+  text-decoration-color: #ef4444;
+}
+
+.suggestions-panel {
+  width: 100%;
+  max-width: 800px;
+  border: 1px solid #27344d;
+  border-radius: 8px;
+  background: #0f1c34;
+  padding: 12px;
+}
+
+@media (min-width: 1024px) {
+  .suggestions-panel {
+    width: 350px;
+  }
+}
+
+.suggestion-item {
+  border-radius: 6px;
+  background: #09111f;
+  padding: 8px 10px;
+}
+
 .editor-image img {
   max-width: 100%;
   height: auto;
