@@ -11,15 +11,15 @@ test.describe('editor formatting', () => {
     const editor = editorOf(page);
 
     await editor.click();
-    await page.keyboard.type('# Project plan');
+    await page.keyboard.type('# Project plan', { delay: 20 });
     await page.keyboard.press('Enter');
-    await page.keyboard.type('- first bullet');
+    await page.keyboard.type('- first bullet', { delay: 20 });
     await page.keyboard.press('Enter');
     await page.keyboard.press('Enter'); // exit the list
-    await page.keyboard.type('1. first step');
+    await page.keyboard.type('1. first step', { delay: 20 });
     await page.keyboard.press('Enter');
     await page.keyboard.press('Enter');
-    await page.keyboard.type('[] buy milk');
+    await page.keyboard.type('[] buy milk', { delay: 20 });
 
     await expect(editor.locator('h1')).toHaveText('Project plan');
     await expect(editor.locator('ul.editor-list-ul li').first()).toHaveText('first bullet');
@@ -38,7 +38,7 @@ test.describe('editor formatting', () => {
     const editor = editorOf(page);
 
     await editor.click();
-    await page.keyboard.type('shopping');
+    await page.keyboard.type('shopping', { delay: 20 });
     await page.getByRole('button', { name: 'Bulleted list' }).click();
     await expect(editor.locator('ul li')).toHaveText('shopping');
 
@@ -54,7 +54,7 @@ test.describe('editor formatting', () => {
     const editor = editorOf(page);
 
     await editor.click();
-    await page.keyboard.type('Liveblocks');
+    await page.keyboard.type('Liveblocks', { delay: 20 });
     await page.keyboard.press('Shift+Home');
     await waitForSelection(page, 'Liveblocks');
 
@@ -161,9 +161,9 @@ test.describe('document tools', () => {
     await createDocument(page);
 
     await editorOf(page).click();
-    await page.keyboard.type('# Introduction');
+    await page.keyboard.type('# Introduction', { delay: 20 });
     await page.keyboard.press('Enter');
-    await page.keyboard.type('one two three');
+    await page.keyboard.type('one two three', { delay: 20 });
 
     await expect(page.getByText('4 words')).toBeVisible();
 
@@ -175,9 +175,9 @@ test.describe('document tools', () => {
     await createDocument(page);
 
     await editorOf(page).click();
-    await page.keyboard.type('# Notes');
+    await page.keyboard.type('# Notes', { delay: 20 });
     await page.keyboard.press('Enter');
-    await page.keyboard.type('- remember this');
+    await page.keyboard.type('- remember this', { delay: 20 });
 
     await page.getByRole('button', { name: 'Download' }).click();
     const [download] = await Promise.all([
