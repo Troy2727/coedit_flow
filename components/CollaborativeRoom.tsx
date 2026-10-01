@@ -11,6 +11,7 @@ import Image from 'next/image';
 import { updateDocument } from '@/lib/actions/room.actions';
 import Loader from './Loader';
 import ShareModal from './ShareModal';
+import RoomAccessRetry from './RoomAccessRetry';
 
 const CollaborativeRoom = ({ roomId, roomMetadata, users, currentUserType, generalAccess }: CollaborativeRoomProps) => {
   const [documentTitle, setDocumentTitle] = useState(roomMetadata.title);
@@ -66,6 +67,7 @@ const CollaborativeRoom = ({ roomId, roomMetadata, users, currentUserType, gener
 
   return (
     <RoomProvider id={roomId}>
+      <RoomAccessRetry />
       <ClientSideSuspense fallback={<Loader />}>
         <div className="collaborative-room">
           <Header>

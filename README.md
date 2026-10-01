@@ -142,6 +142,7 @@ flowchart LR
   - a mismatch between the Liveblocks SDK's TypeScript types and its API responses
   - a development-only React Strict Mode double-mount that detached a collaborator's editor. The suite now runs against a production build.
 - **A sync race found by CI, fixed at the root.** On GitHub's runners, a collaborator who joined a document sometimes got a blank editor that threw `could not find element node` on the next remote edit. Lexical loads the shared Yjs document only through an `observeDeep` listener, which it registers after creating the provider. The Liveblocks provider ignores `connect()` and syncs immediately, so a fast initial sync could land before Lexical was listening. A regression test reproduces it by throttling the joining browser's CPU (failed 3/3 before the fix). A small `patch-package` patch makes Lexical load any state already in the document once it starts listening.
+- **An invite bug that only happened in production.** On the deployed site, an invited user could be stuck on the loader. The room's permissions were already correct, and the user's token was identical to the one from a working local run, yet Liveblocks closed the connection with `4001`. Timed probes showed that a permission change made from Vercel took about 30–60 seconds to reach Liveblocks' realtime servers, while the same change made locally applied at once. The client gives up on `4001`, so the app now retries the connection for up to two minutes. The server has already verified access before the page renders. A test reproduces the denial by intercepting the WebSocket and fails without the retry.
 
 ---
 
@@ -193,7 +194,7 @@ Open [http://localhost:3001](http://localhost:3001).
 
 ```bash
 npx playwright install chromium   # first time only
-npm run test:e2e                  # builds the app and runs 21 end-to-end tests
+npm run test:e2e                  # builds the app and runs 22 end-to-end tests
 ```
 
 GitHub Actions runs the type check and the full end-to-end suite on every pull request and push to `main` (`.github/workflows/ci.yml`).
