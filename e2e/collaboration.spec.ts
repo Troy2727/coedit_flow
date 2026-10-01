@@ -210,6 +210,27 @@ test('sharing with someone who has no account yet keeps the document working', a
   await expect(dialog.getByText('Pending invite')).toBeVisible();
 });
 
+test('an uploaded image is visible to collaborators', async ({ page, browser }) => {
+  const roomId = await createDocument(page);
+  await invite(page, GUEST.email, 'can view');
+
+  await editorOf(page).click();
+  await page.getByRole('button', { name: 'Insert image' }).click();
+  await page.getByLabel('Image description').fill('Uploaded logo');
+  await page.getByLabel('Upload image').setInputFiles('public/assets/images/logo.png');
+  await expect(editorOf(page).getByRole('img', { name: 'Uploaded logo' })).toBeVisible({ timeout: 30_000 });
+
+  // The guest fetches their own short-lived URL for the file
+  const guest = await openAs(browser, GUEST);
+  await guest.page.goto(`/documents/${roomId}`);
+  await waitForEditor(guest.page);
+  const image = editorOf(guest.page).getByRole('img', { name: 'Uploaded logo' });
+  await expect(image).toBeVisible({ timeout: 30_000 });
+  await expect.poll(() => image.evaluate((img: HTMLImageElement) => img.naturalWidth)).toBeGreaterThan(0);
+
+  await guest.context.close();
+});
+
 test('invited viewers get a read-only document', async ({ page, browser }) => {
   const roomId = await createDocument(page);
   await invite(page, GUEST.email, 'can view');

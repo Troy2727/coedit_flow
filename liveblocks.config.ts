@@ -1,5 +1,7 @@
 // Define Liveblocks types for your application
 // https://liveblocks.io/docs/api-reference/liveblocks-react#Typing-your-data
+import type { LiveFile, LiveMap } from '@liveblocks/client';
+
 declare global {
   interface Liveblocks {
     // Each user's Presence, for useMyPresence, useOthers, etc.
@@ -10,8 +12,8 @@ declare global {
 
     // The Storage tree for the room, for useMutation, useStorage, etc.
     Storage: {
-      // Example, a conflict-free list
-      // animals: LiveList<string>;
+      // Images uploaded into the document (the document references them by file id)
+      images?: LiveMap<string, LiveFile>;
     };
 
     // Custom user info set when authenticating with a secret key
