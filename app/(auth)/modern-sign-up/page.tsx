@@ -19,6 +19,15 @@ const ModernSignUpPage = () => {
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  // Set when arriving from an email invitation; the invitation already holds the email
+  const [ticket, setTicket] = useState<string | null>(null);
+  // Clerk requires new email addresses to be confirmed with an emailed code
+  const [pendingVerification, setPendingVerification] = useState(false);
+  const [code, setCode] = useState("");
+
+  useEffect(() => {
+    setTicket(new URLSearchParams(window.location.search).get("__clerk_ticket"));
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -31,23 +40,53 @@ const ModernSignUpPage = () => {
     setErrorMessage("");
 
     try {
-      const result = await signUp.create({
-        firstName,
-        lastName,
-        emailAddress: email,
-        password,
-      });
+      const result = await signUp.create(
+        ticket
+          ? { strategy: "ticket", ticket, firstName, lastName, password }
+          : { firstName, lastName, emailAddress: email, password }
+      );
 
       if (result.status === "complete") {
         await setActive({ session: result.createdSessionId });
         router.push("/");
+      } else if (result.unverifiedFields.includes("email_address")) {
+        await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
+        setPendingVerification(true);
       } else {
         console.error("Sign up failed", result);
         setErrorMessage("Something went wrong. Please try again.");
       }
     } catch (err: any) {
       console.error("Error during sign up:", err);
-      setErrorMessage(err.errors?.[0]?.message || "Something went wrong. Please try again.");
+      setErrorMessage(err.errors?.[0]?.longMessage || err.errors?.[0]?.message || "Something went wrong. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleVerify = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!isLoaded) {
+      return;
+    }
+
+    setIsLoading(true);
+    setErrorMessage("");
+
+    try {
+      const result = await signUp.attemptEmailAddressVerification({ code });
+
+      if (result.status === "complete") {
+        await setActive({ session: result.createdSessionId });
+        router.push("/");
+      } else {
+        console.error("Verification incomplete", result);
+        setErrorMessage("Something went wrong. Please try again.");
+      }
+    } catch (err: any) {
+      console.error("Error during verification:", err);
+      setErrorMessage(err.errors?.[0]?.longMessage || err.errors?.[0]?.message || "That code didn't work. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -168,9 +207,31 @@ const ModernSignUpPage = () => {
 
       {/* Right Side - Sign Up Form */}
       <div className="flex w-full flex-col justify-center bg-[#0a1528] py-8 lg:py-0 lg:w-1/2">
+        {pendingVerification ? (
+          <AnimatedForm
+            header="Check your email"
+            subHeader={`We sent a code to ${email}. Enter it below to finish signing up.`}
+            fields={[
+              {
+                label: "Verification code",
+                required: true,
+                type: "text",
+                placeholder: "Enter the 6-digit code",
+                onChange: (e) => setCode(e.target.value),
+              },
+            ]}
+            submitButton={isLoading ? "Verifying..." : "Verify →"}
+            errorField={errorMessage}
+            onSubmit={handleVerify}
+          />
+        ) : (
         <AnimatedForm
           header="Create your account"
-          subHeader="Welcome! Please fill in the details to get started."
+          subHeader={
+            ticket
+              ? "You've been invited to a document. Create your account to open it."
+              : "Welcome! Please fill in the details to get started."
+          }
           fields={[
             {
               label: "First Name",
@@ -186,13 +247,17 @@ const ModernSignUpPage = () => {
               placeholder: "Enter your last name",
               onChange: (e) => setLastName(e.target.value),
             },
-            {
-              label: "Email",
-              required: true,
-              type: "email",
-              placeholder: "Enter your email",
-              onChange: (e) => setEmail(e.target.value),
-            },
+            ...(ticket
+              ? []
+              : [
+                  {
+                    label: "Email",
+                    required: true,
+                    type: "email" as const,
+                    placeholder: "Enter your email",
+                    onChange: (e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value),
+                  },
+                ]),
             {
               label: "Password",
               required: true,
@@ -210,6 +275,7 @@ const ModernSignUpPage = () => {
           onGoogleSignIn={handleGoogleSignUp}
           forgotPassword={false}
         />
+        )}
       </div>
     </div>
   );

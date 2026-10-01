@@ -33,13 +33,15 @@ const ShareModal = ({ roomId, collaborators, creatorId, currentUserType, general
   const shareDocumentHandler = async () => {
     setLoading(true);
 
-    await updateDocumentAccess({ 
-      roomId, 
-      email, 
-      userType: userType as UserType, 
+    const room = await updateDocumentAccess({
+      roomId,
+      email,
+      userType: userType as UserType,
       updatedBy: user.info,
     });
 
+    // Keep the email on failure so it can be retried
+    if (room) setEmail('');
     setLoading(false);
   }
 
