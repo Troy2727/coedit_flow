@@ -37,7 +37,9 @@ import { $findMatchingParent } from '@lexical/utils';
 import { List, ListChecks, ListOrdered } from 'lucide-react';
 import React from 'react';
 import LinkButton from './LinkButton';
+import ImageButton from './ImageButton';
 import TextStyleControls from './TextStyleControls';
+import TableControls from './TableControls';
 import {
   useCallback,
   useEffect,
@@ -248,6 +250,7 @@ export default function ToolbarPlugin() {
       <Divider />
       <TextStyleControls />
       <LinkButton />
+      <ImageButton />
       <Divider />
       <button
         onClick={() => {
@@ -313,7 +316,9 @@ export default function ToolbarPlugin() {
         title="Numbered list"
       >
         <ListOrdered className="toolbar-icon" />
-      </button>{' '}
+      </button>
+      <Divider />
+      <TableControls />{' '}
     </div>
   );
 }

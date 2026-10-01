@@ -61,6 +61,69 @@ test('two editors see each other’s changes and presence in real time', async (
   await guest.context.close();
 });
 
+test('a slow collaborator joining later gets the existing content and live edits', async ({ page, browser }) => {
+  const roomId = await createDocument(page);
+  await invite(page, GUEST.email, 'can edit');
+
+  await editorOf(page).click();
+  await page.keyboard.type('Written before Gabe joined.', { delay: 20 });
+
+  // A slow CPU makes React mount the editor slowly while Liveblocks syncs at
+  // full speed. Regression: the initial sync used to land before Lexical was
+  // listening, leaving the guest's editor detached from the shared document.
+  const guest = await openAs(browser, GUEST);
+  const cdp = await guest.context.newCDPSession(guest.page);
+  await cdp.send('Emulation.setCPUThrottlingRate', { rate: 6 });
+  await guest.page.goto(`/documents/${roomId}`);
+  await waitForEditor(guest.page);
+
+  await expect(editorOf(guest.page)).toContainText('Written before Gabe joined.');
+
+  await page.keyboard.type(' And after.', { delay: 20 });
+  await expect(editorOf(guest.page)).toContainText('Written before Gabe joined. And after.');
+
+  await guest.context.close();
+});
+
+test('a table inserted by one editor syncs to the other', async ({ page, browser }) => {
+  const roomId = await createDocument(page);
+  await invite(page, GUEST.email, 'can edit');
+
+  const guest = await openAs(browser, GUEST);
+  await guest.page.goto(`/documents/${roomId}`);
+  await waitForEditor(guest.page);
+
+  await editorOf(page).click();
+  await page.getByRole('button', { name: 'Table', exact: true }).click();
+  await page.getByRole('button', { name: 'Insert 3 × 3 table' }).click();
+  await expect(editorOf(guest.page).locator('table tr')).toHaveCount(3);
+
+  await editorOf(guest.page).locator('table td').first().click();
+  await guest.page.keyboard.type('from Gabe', { delay: 20 });
+  await expect(editorOf(page).locator('table td').first()).toHaveText('from Gabe');
+
+  await guest.context.close();
+});
+
+test('an image inserted by one editor syncs to the other', async ({ page, browser, baseURL }) => {
+  const roomId = await createDocument(page);
+  await invite(page, GUEST.email, 'can edit');
+
+  const guest = await openAs(browser, GUEST);
+  await guest.page.goto(`/documents/${roomId}`);
+  await waitForEditor(guest.page);
+
+  await editorOf(page).click();
+  await page.getByRole('button', { name: 'Insert image' }).click();
+  await page.getByLabel('Image URL').fill(`${baseURL}/assets/images/logo.png`);
+  await page.getByLabel('Image description').fill('Shared logo');
+  await page.getByRole('button', { name: 'Insert', exact: true }).click();
+
+  await expect(editorOf(guest.page).getByRole('img', { name: 'Shared logo' })).toBeVisible();
+
+  await guest.context.close();
+});
+
 test('invited viewers get a read-only document', async ({ page, browser }) => {
   const roomId = await createDocument(page);
   await invite(page, GUEST.email, 'can view');
