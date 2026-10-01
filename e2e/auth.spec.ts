@@ -3,6 +3,10 @@ import { createClerkClient } from '@clerk/backend';
 import { createDocument, expect, openAs, test } from './helpers';
 import { GUEST, OWNER } from './test-users';
 
+const ignoreNotFound = (error: { status?: number }) => {
+  if (error.status !== 404) throw error;
+};
+
 test.describe('sign-up', () => {
   // +clerk_test addresses never receive email; Clerk accepts 424242 as their code
   const NEW_USER = 'livedocs-signup+clerk_test@example.com';
@@ -10,7 +14,8 @@ test.describe('sign-up', () => {
 
   const deleteNewUser = async () => {
     const { data } = await clerk.users.getUserList({ emailAddress: [NEW_USER] });
-    for (const user of data) await clerk.users.deleteUser(user.id);
+    // Clerk's user list can briefly still include a just-deleted user; already gone is fine
+    for (const user of data) await clerk.users.deleteUser(user.id).catch(ignoreNotFound);
   };
   test.beforeEach(deleteNewUser);
   test.afterEach(deleteNewUser);
