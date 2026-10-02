@@ -299,6 +299,14 @@ test('version history saves, previews, and restores a version', async ({ page })
   await expect(editor).toHaveText('Version one text');
 });
 
+test('the invite role goes back to "can view" after each invite', async ({ page }) => {
+  await createDocument(page);
+  await invite(page, GUEST.email, 'can edit');
+
+  await page.getByRole('button', { name: /share/i }).first().click();
+  await expect(page.getByRole('dialog').getByRole('combobox').first()).toHaveText('can view');
+});
+
 test('a picked cursor color is what collaborators see', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'Open user menu' }).click();
