@@ -299,6 +299,16 @@ test('version history saves, previews, and restores a version', async ({ page })
   await expect(editor).toHaveText('Version one text');
 });
 
+test('@mentions find collaborators by name, not only by email', async ({ page }) => {
+  await createDocument(page);
+  await invite(page, GUEST.email, 'can edit');
+
+  await page.locator('.lb-composer-editor').first().click();
+  await page.keyboard.type('Hi @Gabe', { delay: 20 });
+
+  await expect(page.getByRole('option', { name: /Gabe Guest/ })).toBeVisible();
+});
+
 test('the invite role goes back to "can view" after each invite', async ({ page }) => {
   await createDocument(page);
   await invite(page, GUEST.email, 'can edit');
