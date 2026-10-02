@@ -298,3 +298,27 @@ test('version history saves, previews, and restores a version', async ({ page })
   await expect(dialog).toBeHidden();
   await expect(editor).toHaveText('Version one text');
 });
+
+test('a picked cursor color is what collaborators see', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Open user menu' }).click();
+  await page.getByRole('menuitem', { name: 'Cursor color' }).click();
+
+  // Pick a color other than the current one, so the test proves a change
+  const teal = page.getByRole('button', { name: 'Teal' });
+  const isTeal = (await teal.getAttribute('aria-pressed')) === 'true';
+  const [name, rgb] = isTeal ? ['Amber', 'rgb(161, 98, 7)'] : ['Teal', 'rgb(15, 118, 110)'];
+
+  await page.getByRole('button', { name }).click();
+  await expect(page.getByRole('status')).toHaveText(/Saved/);
+  await expect(page.getByRole('button', { name })).toHaveAttribute('aria-pressed', 'true');
+
+  // The same account in a second tab shows up as a collaborator in the first
+  const roomId = await createDocument(page);
+  const secondTab = await page.context().newPage();
+  await secondTab.goto(`/documents/${roomId}`);
+  await waitForEditor(secondTab);
+
+  await expect(page.locator('.collaborators-list img')).toHaveCSS('border-top-color', rgb);
+  await secondTab.close();
+});
