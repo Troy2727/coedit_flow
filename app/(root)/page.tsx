@@ -2,10 +2,11 @@ import AddDocumentBtn from '@/components/AddDocumentBtn';
 import { DeleteModal } from '@/components/DeleteModal';
 import Header from '@/components/Header'
 import Notifications from '@/components/Notifications';
+import UserMenu from '@/components/UserMenu';
 import { Button } from '@/components/ui/button'
 import { getDocuments } from '@/lib/actions/room.actions';
 import { dateConverter } from '@/lib/utils';
-import { SignedIn, UserButton } from '@clerk/nextjs'
+import { SignedIn } from '@clerk/nextjs'
 import { currentUser } from '@clerk/nextjs/server';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -30,7 +31,7 @@ const Home = async ({ searchParams }: SearchParamProps) => {
         <div className="flex items-center gap-2 lg:gap-4">
           <Notifications />
           <SignedIn>
-            <UserButton afterSignOutUrl="/modern-sign-in" />
+            <UserMenu />
           </SignedIn>
         </div>
       </Header>

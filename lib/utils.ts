@@ -65,20 +65,29 @@ export function getRandomColor() {
 
 // Collaborator cursor labels show white text on these, so each one keeps at least
 // 4.5:1 contrast with white (WCAG AA) and stays visible on the dark page.
-export const brightColors = [
-  '#2563EB', // Blue
-  '#7C3AED', // Violet
-  '#DB2777', // Pink
-  '#DC2626', // Red
-  '#C2410C', // Orange
-  '#047857', // Emerald
-  '#0F766E', // Teal
-  '#0369A1', // Sky
-  '#9333EA', // Purple
-  '#BE185D', // Rose
-  '#A16207', // Amber
-  '#15803D', // Green
-];
+export const cursorColors = {
+  Blue: '#2563EB',
+  Violet: '#7C3AED',
+  Pink: '#DB2777',
+  Red: '#DC2626',
+  Orange: '#C2410C',
+  Emerald: '#047857',
+  Teal: '#0F766E',
+  Sky: '#0369A1',
+  Purple: '#9333EA',
+  Rose: '#BE185D',
+  Amber: '#A16207',
+  Green: '#15803D',
+};
+
+export const brightColors = Object.values(cursorColors);
+
+// A color the user picked (saved on their Clerk account) wins over the default
+export function getCursorColor(userId: string, savedColor: unknown) {
+  return typeof savedColor === 'string' && brightColors.includes(savedColor)
+    ? savedColor
+    : getUserColor(userId);
+}
 
 export function getUserColor(userId: string) {
   let sum = 0;
