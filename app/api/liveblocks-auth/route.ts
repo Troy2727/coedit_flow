@@ -1,5 +1,5 @@
 import { liveblocks } from "@/lib/liveblocks";
-import { getUserColor } from "@/lib/utils";
+import { getCursorColor } from "@/lib/utils";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
@@ -8,7 +8,7 @@ export async function POST(request: Request) {
 
   if(!clerkUser) redirect('/modern-sign-in');
 
-  const { id, firstName, lastName, emailAddresses, imageUrl } = clerkUser;
+  const { id, firstName, lastName, emailAddresses, imageUrl, publicMetadata } = clerkUser;
 
   // Get the current user from your database
   const user = {
@@ -18,7 +18,7 @@ export async function POST(request: Request) {
       name: `${firstName} ${lastName}`,
       email: emailAddresses[0].emailAddress,
       avatar: imageUrl,
-      color: getUserColor(id),
+      color: getCursorColor(id, publicMetadata.cursorColor),
     }
   }
 
