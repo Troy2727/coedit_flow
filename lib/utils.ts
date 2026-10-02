@@ -63,26 +63,21 @@ export function getRandomColor() {
   return randomColor;
 }
 
+// Collaborator cursor labels show white text on these, so each one keeps at least
+// 4.5:1 contrast with white (WCAG AA) and stays visible on the dark page.
 export const brightColors = [
-  '#2E8B57', // Darker Neon Green
-  '#FF6EB4', // Darker Neon Pink
-  '#00CDCD', // Darker Cyan
-  '#FF00FF', // Darker Neon Magenta
-  '#FF007F', // Darker Bright Pink
-  '#FFD700', // Darker Neon Yellow
-  '#00CED1', // Darker Neon Mint Green
-  '#FF1493', // Darker Neon Red
-  '#00CED1', // Darker Bright Aqua
-  '#FF7F50', // Darker Neon Coral
-  '#9ACD32', // Darker Neon Lime
-  '#FFA500', // Darker Neon Orange
-  '#32CD32', // Darker Neon Chartreuse
-  '#ADFF2F', // Darker Neon Yellow Green
-  '#DB7093', // Darker Neon Fuchsia
-  '#00FF7F', // Darker Spring Green
-  '#FFD700', // Darker Electric Lime
-  '#FF007F', // Darker Bright Magenta
-  '#FF6347', // Darker Neon Vermilion
+  '#2563EB', // Blue
+  '#7C3AED', // Violet
+  '#DB2777', // Pink
+  '#DC2626', // Red
+  '#C2410C', // Orange
+  '#047857', // Emerald
+  '#0F766E', // Teal
+  '#0369A1', // Sky
+  '#9333EA', // Purple
+  '#BE185D', // Rose
+  '#A16207', // Amber
+  '#15803D', // Green
 ];
 
 export function getUserColor(userId: string) {

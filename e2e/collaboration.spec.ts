@@ -247,6 +247,8 @@ test('invited viewers get a read-only document', async ({ page, browser }) => {
   await expect(guest.page.getByRole('button', { name: 'Insert image' })).toHaveCount(0);
   await expect(guest.page.getByRole('button', { name: 'Suggest edit' })).toHaveCount(0);
   await expect(guest.page.getByRole('button', { name: 'Download' })).toBeVisible();
+  // Only editors can manage access
+  await expect(guest.page.getByRole('button', { name: /share/i })).toBeDisabled();
 
   await guest.context.close();
 });
