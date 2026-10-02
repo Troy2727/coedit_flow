@@ -40,3 +40,13 @@ test('owners can delete a document from the home page', async ({ page }) => {
 
   await expect(row).toHaveCount(0);
 });
+
+test('deleting an open document returns to the home page', async ({ page }) => {
+  const roomId = await createDocument(page);
+
+  await page.locator('.toolbar-wrapper').getByRole('button').filter({ has: page.getByAltText('delete') }).click();
+  await page.getByRole('button', { name: 'Delete', exact: true }).click();
+
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page.locator(`a[href="/documents/${roomId}"]`)).toHaveCount(0);
+});

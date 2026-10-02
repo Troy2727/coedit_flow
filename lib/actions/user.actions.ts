@@ -40,10 +40,17 @@ export const getDocumentUsers = async ({ roomId, currentUser, text }: { roomId: 
 
     const users = Object.keys(room.usersAccesses).filter((email) => email !== currentUser);
 
-    if(text.length) {
+    // Skip the lookup when nobody else has access: an empty email filter lists every Clerk user
+    if(text.length && users.length) {
       const lowerCaseText = text.toLowerCase();
 
-      const filteredUsers = users.filter((email: string) => email.toLowerCase().includes(lowerCaseText))
+      // Match names too, so "@Ramon" finds people, not only "@ramon@..."
+      const { data } = await clerkClient.users.getUserList({ emailAddress: users, limit: users.length });
+      const names = new Map(data.map((user) => [user.emailAddresses[0].emailAddress, `${user.firstName} ${user.lastName}`]));
+
+      const filteredUsers = users.filter((email: string) =>
+        email.toLowerCase().includes(lowerCaseText) || names.get(email)?.toLowerCase().includes(lowerCaseText)
+      )
 
       return parseStringify(filteredUsers);
     }
