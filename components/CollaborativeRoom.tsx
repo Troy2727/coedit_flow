@@ -3,7 +3,7 @@
 import { ClientSideSuspense, RoomProvider } from '@liveblocks/react/suspense'
 import { Editor } from '@/components/editor/Editor'
 import Header from '@/components/Header'
-import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from '@clerk/nextjs'
+import { SignedIn, SignedOut, SignInButton, useUser } from '@clerk/nextjs'
 import ActiveCollaborators from './ActiveCollaborators';
 import { useEffect, useRef, useState } from 'react';
 import { Input } from './ui/input';
@@ -12,6 +12,7 @@ import { updateDocument } from '@/lib/actions/room.actions';
 import Loader from './Loader';
 import ShareModal from './ShareModal';
 import RoomAccessRetry from './RoomAccessRetry';
+import UserMenu from './UserMenu';
 
 const CollaborativeRoom = ({ roomId, roomMetadata, users, currentUserType, generalAccess }: CollaborativeRoomProps) => {
   const [documentTitle, setDocumentTitle] = useState(roomMetadata.title);
@@ -121,7 +122,7 @@ const CollaborativeRoom = ({ roomId, roomMetadata, users, currentUserType, gener
                 <SignInButton />
               </SignedOut>
               <SignedIn>
-                <UserButton afterSignOutUrl="/modern-sign-in" />
+                <UserMenu />
               </SignedIn>
             </div>
           </Header>
