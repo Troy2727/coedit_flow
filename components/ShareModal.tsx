@@ -40,8 +40,12 @@ const ShareModal = ({ roomId, collaborators, creatorId, currentUserType, general
       updatedBy: user.info,
     });
 
-    // Keep the email on failure so it can be retried
-    if (room) setEmail('');
+    // Keep the email and role on failure so it can be retried. After a successful
+    // invite, go back to the safer "can view" so the next invite isn't an editor by accident.
+    if (room) {
+      setEmail('');
+      setUserType('viewer');
+    }
     setLoading(false);
   }
 
