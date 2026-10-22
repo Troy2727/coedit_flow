@@ -236,6 +236,8 @@ e2e/                              Playwright end-to-end tests
 
 **Alex Mieses** · [GitHub](https://github.com/Troy2727)
 
+LiveDocs began as JavaScript Mastery's [collaborative-editor](https://github.com/adrianhajdin/collaborative-editor) course project. The codebase has since been rewritten, and version history, suggestions, tables, images, export, link sharing, email invitations, server-side permission checks and the Playwright suite were built for LiveDocs.
+
 ---
 
 ## 📄 License

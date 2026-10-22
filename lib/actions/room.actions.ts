@@ -1,269 +1,188 @@
 'use server';
 
-import { nanoid } from 'nanoid'
-import { liveblocks } from '../liveblocks';
-import { revalidatePath } from 'next/cache';
-import { getAccessType, parseStringify } from '../utils';
-import { redirect } from 'next/navigation';
+// Every export here is a public HTTP endpoint (Next.js server action), so each one
+// re-checks who is calling and what they may do. Failures are logged and return
+// undefined, which the UI treats as "didn't work".
+
 import { clerkClient, currentUser } from '@clerk/nextjs/server';
+import { nanoid } from 'nanoid';
+import { revalidatePath } from 'next/cache';
 import { headers } from 'next/headers';
+import { redirect } from 'next/navigation';
+import { liveblocks } from '../liveblocks';
+import { getAccessType, parseStringify } from '../utils';
 
-// Server actions are public endpoints, so every action re-checks the caller server-side.
-const getCurrentUserEmail = async () => {
-  const clerkUser = await currentUser();
-  if(!clerkUser) throw new Error('You must be signed in');
+class AccessDenied extends Error {}
 
-  return clerkUser.emailAddresses[0].emailAddress;
+async function signedInEmail(): Promise<string> {
+  const user = await currentUser();
+  if (!user) throw new AccessDenied('You must be signed in');
+  return user.emailAddresses[0].emailAddress;
 }
 
-const assertRoomPermission = async (roomId: string, level: 'editor' | 'creator') => {
-  const email = await getCurrentUserEmail();
+/**
+ * The room, if the caller may act on it. 'editor' needs write access, given to
+ * them directly or to everyone through link sharing; 'creator' must own it.
+ */
+async function roomFor(roomId: string, needs: 'editor' | 'creator') {
+  const email = await signedInEmail();
   const room = await liveblocks.getRoom(roomId);
-
-  // Invited users get their own access; everyone else falls back to link sharing (defaultAccesses)
   const access = (room.usersAccesses[email] ?? room.defaultAccesses) as string[];
-
-  const allowed = level === 'creator'
-    ? room.metadata.email === email
-    : access.includes('room:write');
-
-  if(!allowed) throw new Error('You do not have permission to do this');
-
+  const allowed = needs === 'creator' ? room.metadata.email === email : access.includes('room:write');
+  if (!allowed) throw new AccessDenied('You do not have permission to do this');
   return room;
 }
 
-export const createDocument = async ({ userId, email }: CreateDocumentParams) => {
-  const roomId = nanoid();
-
+/** Run an action, logging and swallowing any error so the client just gets undefined. */
+async function attempt<T>(what: string, action: () => Promise<T>): Promise<T | undefined> {
   try {
-    const clerkUser = await currentUser();
-    if(!clerkUser || clerkUser.id !== userId || clerkUser.emailAddresses[0].emailAddress !== email) {
-      throw new Error('You can only create documents for yourself');
-    }
+    return await action();
+  } catch (error) {
+    console.log(`Could not ${what}: ${error}`);
+    return undefined;
+  }
+}
 
-    const metadata = {
-      creatorId: userId,
-      email,
-      title: 'Untitled'
+export const createDocument = async ({ userId, email }: CreateDocumentParams) =>
+  attempt('create a document', async () => {
+    const user = await currentUser();
+    if (!user || user.id !== userId || user.emailAddresses[0].emailAddress !== email) {
+      throw new AccessDenied('You can only create documents for yourself');
     }
-
-    const usersAccesses: RoomAccesses = {
-      [email]: ['room:write']
-    }
-
-    const room = await liveblocks.createRoom(roomId, {
-      metadata,
-      usersAccesses,
-      defaultAccesses: []
+    const room = await liveblocks.createRoom(nanoid(), {
+      metadata: { creatorId: userId, email, title: 'Untitled' },
+      usersAccesses: { [email]: ['room:write'] },
+      defaultAccesses: [],
     });
-    
     revalidatePath('/');
-
     return parseStringify(room);
-  } catch (error) {
-    console.log(`Error happened while creating a room: ${error}`);
-  }
-}
+  });
 
-export const getDocument = async ({ roomId, userId }: { roomId: string; userId: string }) => {
-  try {
-      if(userId !== await getCurrentUserEmail()) {
-        throw new Error('You do not have access to this document');
-      }
+export const getDocument = async ({ roomId, userId }: { roomId: string; userId: string }) =>
+  attempt('open a document', async () => {
+    if (userId !== (await signedInEmail())) throw new AccessDenied('You do not have access to this document');
+    const room = await liveblocks.getRoom(roomId);
+    const invited = userId in room.usersAccesses;
+    const linkShared = room.defaultAccesses.length > 0;
+    if (!invited && !linkShared) throw new AccessDenied('You do not have access to this document');
+    return parseStringify(room);
+  });
 
-      const room = await liveblocks.getRoom(roomId);
+export const getDocuments = async (email: string) =>
+  attempt('list documents', async () => {
+    if (email !== (await signedInEmail())) throw new AccessDenied('You can only list your own documents');
+    return parseStringify(await liveblocks.getRooms({ userId: email }));
+  });
 
-      const hasAccess = Object.keys(room.usersAccesses).includes(userId) || room.defaultAccesses.length > 0;
-    
-      if(!hasAccess) {
-        throw new Error('You do not have access to this document');
-      }
-    
-      return parseStringify(room);
-  } catch (error) {
-    console.log(`Error happened while getting a room: ${error}`);
-  }
-}
-
-export const updateDocument = async (roomId: string, title: string) => {
-  try {
-    await assertRoomPermission(roomId, 'editor');
-
-    const updatedRoom = await liveblocks.updateRoom(roomId, {
-      metadata: {
-        title
-      }
-    })
-
+export const updateDocument = async (roomId: string, title: string) =>
+  attempt('rename a document', async () => {
+    await roomFor(roomId, 'editor');
+    const room = await liveblocks.updateRoom(roomId, { metadata: { title } });
     revalidatePath(`/documents/${roomId}`);
+    return parseStringify(room);
+  });
 
-    return parseStringify(updatedRoom);
-  } catch (error) {
-    console.log(`Error happened while updating a room: ${error}`);
-  }
-}
+export const updateDocumentAccess = async ({ roomId, email, userType, updatedBy }: ShareDocumentParams) =>
+  attempt('share a document', async () => {
+    const existing = await roomFor(roomId, 'editor');
+    if (existing.metadata.email === email) throw new AccessDenied("The owner's access cannot be changed");
 
-export const getDocuments = async (email: string ) => {
-  try {
-      if(email !== await getCurrentUserEmail()) {
-        throw new Error('You can only list your own documents');
-      }
+    const room = await liveblocks.updateRoom(roomId, { usersAccesses: { [email]: getAccessType(userType) } });
 
-      const rooms = await liveblocks.getRooms({ userId: email });
-    
-      return parseStringify(rooms);
-  } catch (error) {
-    console.log(`Error happened while getting rooms: ${error}`);
-  }
-}
-
-export const updateDocumentAccess = async ({ roomId, email, userType, updatedBy }: ShareDocumentParams) => {
-  try {
-    const existingRoom = await assertRoomPermission(roomId, 'editor');
-
-    if(existingRoom.metadata.email === email) {
-      throw new Error("The owner's access cannot be changed");
-    }
-
-    const usersAccesses: RoomAccesses = {
-      [email]: getAccessType(userType) as AccessType,
-    }
-
-    const room = await liveblocks.updateRoom(roomId, { 
-      usersAccesses
-    })
-
-    if(room) {
-      const notificationId = nanoid();
-
-      // Access is already granted. Telling the person about it is best-effort, so a
-      // failure here (e.g. Liveblocks refusing notifications with 403) must not make
-      // the invite look failed or skip the email invitation.
-      // The e2e test server turns notifications off: its constant invites used up the
-      // Liveblocks free tier's monthly notifications, leaving none for real users.
-      if (process.env.SKIP_ACCESS_NOTIFICATIONS !== 'true') {
-        await liveblocks.triggerInboxNotification({
-          userId: email,
-          kind: '$documentAccess',
-          subjectId: notificationId,
-          activityData: {
-            userType,
-            title: `You have been granted ${userType} access to the document by ${updatedBy.name}`,
-            updatedBy: updatedBy.name,
-            avatar: updatedBy.avatar,
-            email: updatedBy.email
-          },
-          roomId
-        }).catch((error) => console.log(`Access notification not sent: ${error}`));
-      }
-
-      await sendSignUpInvitation(email).catch((error) => console.log(`Sign-up invitation not sent: ${error}`));
-    }
+    // Access is granted at this point. Telling the person is best-effort: a failed
+    // notification or email must not make the invite look failed.
+    await notifyAccessGranted({ roomId, email, userType, updatedBy });
+    await inviteToSignUp(email);
 
     revalidatePath(`/documents/${roomId}`);
     return parseStringify(room);
-  } catch (error) {
-    console.log(`Error happened while updating a room access: ${error}`);
-  }
+  });
+
+async function notifyAccessGranted({ roomId, email, userType, updatedBy }: ShareDocumentParams) {
+  // The e2e server sets this: its constant invites would use up the Liveblocks free
+  // tier's monthly notifications and leave none for real users.
+  if (process.env.SKIP_ACCESS_NOTIFICATIONS === 'true') return;
+  await liveblocks
+    .triggerInboxNotification({
+      userId: email,
+      kind: '$documentAccess',
+      subjectId: nanoid(),
+      roomId,
+      activityData: {
+        userType,
+        title: `You have been granted ${userType} access to the document by ${updatedBy.name}`,
+        updatedBy: updatedBy.name,
+        avatar: updatedBy.avatar,
+        email: updatedBy.email,
+      },
+    })
+    .catch((error) => console.log(`Access notification not sent: ${error}`));
 }
 
-// Access is stored by email, so someone invited before signing up gets it as soon as
-// they create an account. Email them a sign-up link so they know they were invited.
-const sendSignUpInvitation = async (email: string) => {
-  const { data: existingUsers } = await clerkClient.users.getUserList({ emailAddress: [email] });
-  if (existingUsers.length > 0) return;
-
-  const origin = headers().get('origin');
-
-  await clerkClient.invitations
-    .createInvitation({
+/**
+ * Access is stored by email, so people invited before they have an account get it
+ * the moment they sign up. Email them a sign-up link so they know.
+ */
+async function inviteToSignUp(email: string) {
+  try {
+    const { data: accounts } = await clerkClient.users.getUserList({ emailAddress: [email] });
+    if (accounts.length > 0) return;
+    const origin = headers().get('origin');
+    await clerkClient.invitations.createInvitation({
       emailAddress: email,
       redirectUrl: origin ? `${origin}/modern-sign-up` : undefined,
-    })
-    .catch((error) => {
-      // Clerk refuses a second invitation while one is pending, e.g. when a pending
-      // person's role changes; the first invitation is still valid.
-      console.log(`Sign-up invitation not sent: ${error}`);
     });
-}
-
-export const removeCollaborator = async ({ roomId, email }: {roomId: string, email: string}) => {
-  try {
-    const room = await assertRoomPermission(roomId, 'editor');
-
-    if(room.metadata.email === email) {
-      throw new Error('You cannot remove yourself from the document');
-    }
-
-    const updatedRoom = await liveblocks.updateRoom(roomId, {
-      usersAccesses: {
-        [email]: null
-      }
-    })
-
-    revalidatePath(`/documents/${roomId}`);
-    return parseStringify(updatedRoom);
   } catch (error) {
-    console.log(`Error happened while removing a collaborator: ${error}`);
+    // Includes Clerk refusing a second invitation while the first is still pending.
+    console.log(`Sign-up invitation not sent: ${error}`);
   }
 }
 
-export const updateGeneralAccess = async (roomId: string, generalAccess: GeneralAccess) => {
-  try {
-    await assertRoomPermission(roomId, 'editor');
-
-    const room = await liveblocks.updateRoom(roomId, {
-      defaultAccesses: generalAccess === 'restricted' ? [] : getAccessType(generalAccess) as AccessType,
-    });
-
+export const removeCollaborator = async ({ roomId, email }: { roomId: string; email: string }) =>
+  attempt('remove a collaborator', async () => {
+    const existing = await roomFor(roomId, 'editor');
+    if (existing.metadata.email === email) throw new AccessDenied('You cannot remove yourself from the document');
+    const room = await liveblocks.updateRoom(roomId, { usersAccesses: { [email]: null } });
     revalidatePath(`/documents/${roomId}`);
     return parseStringify(room);
-  } catch (error) {
-    console.log(`Error happened while updating general access: ${error}`);
-  }
-}
+  });
 
-export const getDocumentVersions = async (roomId: string) => {
-  try {
-    await assertRoomPermission(roomId, 'editor');
+export const updateGeneralAccess = async (roomId: string, generalAccess: GeneralAccess) =>
+  attempt('change link sharing', async () => {
+    await roomFor(roomId, 'editor');
+    const room = await liveblocks.updateRoom(roomId, {
+      defaultAccesses: generalAccess === 'restricted' ? [] : getAccessType(generalAccess),
+    });
+    revalidatePath(`/documents/${roomId}`);
+    return parseStringify(room);
+  });
 
+export const getDocumentVersions = async (roomId: string) =>
+  attempt('list versions', async () => {
+    await roomFor(roomId, 'editor');
     const { data } = await liveblocks.getVersionHistory(roomId);
-
     return parseStringify(data);
-  } catch (error) {
-    console.log(`Error happened while getting versions: ${error}`);
-  }
-}
+  });
 
-export const createVersionSnapshot = async (roomId: string) => {
-  try {
-    await assertRoomPermission(roomId, 'editor');
-
+export const createVersionSnapshot = async (roomId: string) =>
+  attempt('save a version', async () => {
+    await roomFor(roomId, 'editor');
     const snapshot = await liveblocks.createVersionHistorySnapshot(roomId);
-
-    // Liveblocks can answer 204 "Could not create version" (e.g. edits not persisted yet)
-    // without throwing, so only a returned version id counts as success. The SDK types
-    // say { data: { id } } but the API returns { id }, so accept both.
-    const versionId = snapshot?.data?.id ?? (snapshot as unknown as { id?: string })?.id;
-    if(!versionId) throw new Error(`No version created: ${JSON.stringify(snapshot)}`);
-
+    // Liveblocks can answer 204 "Could not create version" (e.g. edits not saved yet)
+    // without throwing, so only a returned id counts. The SDK types say { data: { id } }
+    // but the API returns { id }; accept both.
+    const id = snapshot?.data?.id ?? (snapshot as unknown as { id?: string })?.id;
+    if (!id) throw new Error(`no version created: ${JSON.stringify(snapshot)}`);
     return parseStringify(snapshot);
-  } catch (error) {
-    console.log(`Error happened while saving a version: ${error}`);
-  }
-}
+  });
 
 export const deleteDocument = async (roomId: string) => {
-  try {
-    await assertRoomPermission(roomId, 'creator');
-
+  const deleted = await attempt('delete a document', async () => {
+    await roomFor(roomId, 'creator');
     await liveblocks.deleteRoom(roomId);
     revalidatePath('/');
-  } catch (error) {
-    console.log(`Error happened while deleting a room: ${error}`);
-    return;
-  }
-
-  // Outside the try: redirect() works by throwing, which the catch would swallow
-  redirect('/');
-}
+    return true;
+  });
+  // redirect() works by throwing, so it must run outside attempt()'s catch.
+  if (deleted) redirect('/');
+};

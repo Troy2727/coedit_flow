@@ -1,35 +1,28 @@
-import { liveblocks } from "@/lib/liveblocks";
-import { getCursorColor } from "@/lib/utils";
-import { currentUser } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
+import { currentUser } from '@clerk/nextjs/server';
+import { redirect } from 'next/navigation';
+import { liveblocks } from '@/lib/liveblocks';
+import { getCursorColor } from '@/lib/utils';
 
-export async function POST(request: Request) {
-  const clerkUser = await currentUser();
+/**
+ * Liveblocks calls this when the editor connects. Users are identified by email,
+ * because room access is granted by email (including people invited before signing up).
+ */
+export async function POST() {
+  const user = await currentUser();
+  if (!user) redirect('/modern-sign-in');
 
-  if(!clerkUser) redirect('/modern-sign-in');
-
-  const { id, firstName, lastName, emailAddresses, imageUrl, publicMetadata } = clerkUser;
-
-  // Get the current user from your database
-  const user = {
-    id,
-    info: {
-      id,
-      name: `${firstName} ${lastName}`,
-      email: emailAddresses[0].emailAddress,
-      avatar: imageUrl,
-      color: getCursorColor(id, publicMetadata.cursorColor),
-    }
-  }
-
-  // Identify the user and return the result
+  const email = user.emailAddresses[0].emailAddress;
   const { status, body } = await liveblocks.identifyUser(
+    { userId: email, groupIds: [] },
     {
-      userId: user.info.email,
-      groupIds: [],
+      userInfo: {
+        id: user.id,
+        name: `${user.firstName} ${user.lastName}`,
+        email,
+        avatar: user.imageUrl,
+        color: getCursorColor(user.id, user.publicMetadata.cursorColor),
+      },
     },
-    { userInfo: user.info },
   );
-
   return new Response(body, { status });
 }

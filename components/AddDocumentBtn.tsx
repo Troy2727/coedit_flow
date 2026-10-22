@@ -1,31 +1,27 @@
 'use client';
 
-import { createDocument } from '@/lib/actions/room.actions';
-import { Button } from './ui/button'
-import Image from 'next/image'
+import { FilePlus2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { createDocument } from '@/lib/actions/room.actions';
+import { Button } from './ui/button';
 
-const AddDocumentBtn = ({ userId, email }: AddDocumentBtnProps) => {
+/** Creates an empty document owned by the user and opens it. */
+export default function AddDocumentBtn({ userId, email }: AddDocumentBtnProps) {
   const router = useRouter();
+  const [creating, setCreating] = useState(false);
 
-  const addDocumentHandler = async () => {
-    try {
-      const room = await createDocument({ userId, email });
-
-      if(room) router.push(`/documents/${room.id}`);
-    } catch (error) {
-      console.log(error)
-    }
+  async function create() {
+    setCreating(true);
+    const room = await createDocument({ userId, email });
+    if (room) router.push(`/documents/${room.id}`);
+    else setCreating(false);
   }
 
   return (
-    <Button type="submit" onClick={addDocumentHandler} className="gradient-blue flex gap-1 shadow-md">
-      <Image 
-        src="/assets/icons/add.svg" alt="add" width={24} height={24}
-      />
-      <p className="hidden sm:block">Start a blank document</p>
+    <Button type="button" onClick={create} disabled={creating} className="gradient-blue flex gap-1 shadow-md" aria-label="Start a blank document">
+      <FilePlus2 className="size-6" aria-hidden />
+      <span className="hidden sm:block">Start a blank document</span>
     </Button>
-  )
+  );
 }
-
-export default AddDocumentBtn

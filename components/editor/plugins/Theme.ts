@@ -1,52 +1,39 @@
-/* eslint-disable import/no-anonymous-default-export */
-/**
- * Copyright (c) Meta Platforms, Inc. and affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- */
-export default {
-  code: 'editor-code',
-  heading: {
-    h1: 'editor-heading-h1',
-    h2: 'editor-heading-h2',
-    h3: 'editor-heading-h3',
-    h4: 'editor-heading-h4',
-    h5: 'editor-heading-h5',
-  },
-  image: 'editor-image',
-  link: 'editor-link',
-  list: {
-    listitem: 'editor-listitem',
-    listitemChecked: 'editor-listitem-checked',
-    listitemUnchecked: 'editor-listitem-unchecked',
-    nested: {
-      listitem: 'editor-nested-listitem',
-    },
-    ol: 'editor-list-ol',
-    ul: 'editor-list-ul',
-  },
+import type { EditorThemeClasses } from 'lexical';
+
+// Lexical tags each node it renders with these classes; styles/editor.css
+// styles them and the e2e tests select on several (editor-text-bold, editor-list-ol...).
+const cls = (name: string) => `editor-${name}`;
+
+const theme: EditorThemeClasses = {
   ltr: 'ltr',
-  paragraph: 'editor-paragraph',
-  placeholder: 'editor-placeholder',
-  quote: 'editor-quote',
   rtl: 'rtl',
-  suggestionInsert: 'editor-suggestion-insert',
-  suggestionDelete: 'editor-suggestion-delete',
-  table: 'editor-table',
-  tableCell: 'editor-table-cell',
-  tableCellHeader: 'editor-table-cell-header',
-  tableSelection: 'editor-table-selection',
-  tableCellSelected: 'editor-table-cell-selected',
-  text: {
-    bold: 'editor-text-bold',
-    code: 'editor-text-code',
-    hashtag: 'editor-text-hashtag',
-    italic: 'editor-text-italic',
-    overflowed: 'editor-text-overflowed',
-    strikethrough: 'editor-text-strikethrough',
-    underline: 'editor-text-underline',
-    underlineStrikethrough: 'editor-text-underlineStrikethrough',
+  paragraph: cls('paragraph'),
+  quote: cls('quote'),
+  code: cls('code'),
+  link: cls('link'),
+  image: cls('image'),
+  heading: Object.fromEntries(['h1', 'h2', 'h3', 'h4', 'h5'].map((h) => [h, cls(`heading-${h}`)])),
+  list: {
+    ol: cls('list-ol'),
+    ul: cls('list-ul'),
+    listitem: cls('listitem'),
+    listitemChecked: cls('listitem-checked'),
+    listitemUnchecked: cls('listitem-unchecked'),
+    nested: { listitem: cls('nested-listitem') },
   },
+  table: cls('table'),
+  tableCell: cls('table-cell'),
+  tableCellHeader: cls('table-cell-header'),
+  tableSelection: cls('table-selection'),
+  tableCellSelected: cls('table-cell-selected'),
+  text: Object.fromEntries(
+    ['bold', 'italic', 'underline', 'strikethrough', 'underlineStrikethrough', 'code', 'hashtag', 'overflowed'].map(
+      (format) => [format, cls(`text-${format}`)],
+    ),
+  ),
+  // Custom keys read by SuggestionNode
+  suggestionInsert: cls('suggestion-insert'),
+  suggestionDelete: cls('suggestion-delete'),
 };
+
+export default theme;

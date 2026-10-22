@@ -1,0 +1,289 @@
+/*
+ * The document editor: the page itself, the formatting Lexical applies (class
+ * names come from components/editor/plugins/Theme.ts), and the toolbar.
+ */
+
+:root {
+  --page: #0b1527; /* the document "paper" */
+  --page-text: #b4c6ee;
+  --panel: #0f1c34; /* toolbar hover, table headers, suggestion panel */
+  --toolbar: #09111f;
+  --line: #27344d;
+  --accent: #3371ff;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 500;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ---------- The page */
+
+.editor-container {
+  color: #000;
+  font-weight: 400;
+  line-height: 20px;
+  text-align: left;
+}
+
+.editor-inner {
+  position: relative;
+  background: var(--page);
+}
+
+.editor-input {
+  position: relative;
+  min-height: 400px;
+  padding: 40px;
+  outline: 0;
+  resize: none;
+  tab-size: 1;
+  font-size: 15px;
+  color: var(--page-text);
+  caret-color: #fff; /* the default dark caret disappears on the dark page */
+}
+
+.editor-placeholder {
+  position: absolute;
+  top: 40px;
+  left: 40px;
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 15px;
+  color: var(--page-text);
+  pointer-events: none;
+  user-select: none;
+}
+
+.ltr { text-align: left; }
+.rtl { text-align: right; }
+
+/* ---------- Blocks */
+
+.editor-paragraph {
+  position: relative;
+  margin: 0 0 8px;
+}
+.editor-paragraph:last-child { margin-bottom: 0; }
+
+.editor-heading-h1,
+.editor-heading-h2,
+.editor-heading-h3 {
+  margin: 0;
+  padding: 0;
+}
+.editor-heading-h1 { font-size: 2rem; margin-bottom: 12px; }
+.editor-heading-h2 { font-size: 1.5rem; }
+.editor-heading-h3 { font-size: 1.25rem; }
+
+.editor-quote {
+  margin: 0 0 0 20px;
+  padding-left: 16px;
+  border-left: 4px solid #4b5563;
+  font-size: 15px;
+  color: #94a3b8;
+}
+
+.editor-link {
+  color: #5b8cff;
+  text-decoration: none;
+}
+
+.editor-image img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+/* ---------- Inline formats */
+
+.editor-text-bold { font-weight: bold; }
+.editor-text-italic { font-style: italic; }
+.editor-text-underline { text-decoration: underline; }
+.editor-text-strikethrough { text-decoration: line-through; }
+.editor-text-underlineStrikethrough { text-decoration: underline line-through; }
+
+.editor-text-code {
+  padding: 1px 4px;
+  border-radius: 3px;
+  background: var(--panel);
+  font-family: Menlo, Consolas, Monaco, monospace;
+  font-size: 94%;
+}
+
+/* ---------- Lists (Tailwind's preflight removes markers, so they're set here) */
+
+.editor-list-ul,
+.editor-list-ol {
+  margin: 0 0 0 16px;
+  padding: 0;
+}
+.editor-list-ul { list-style-type: disc; }
+.editor-list-ol { list-style-type: decimal; }
+
+.editor-listitem { margin: 8px 32px; }
+.editor-nested-listitem { list-style-type: none; }
+
+/* Checklists: CheckListPlugin toggles an item when its ::before box is clicked. */
+.editor-listitem-checked,
+.editor-listitem-unchecked {
+  position: relative;
+  margin: 0 8px;
+  padding: 0 24px;
+  list-style-type: none;
+  outline: none;
+}
+
+.editor-listitem-checked {
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+.editor-listitem-checked::before,
+.editor-listitem-unchecked::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 0;
+  display: block;
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--page-text);
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.editor-listitem-checked::before {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+/* The tick: a rotated L drawn with two borders */
+.editor-listitem-checked::after {
+  content: '';
+  position: absolute;
+  top: 5px;
+  left: 6px;
+  display: block;
+  width: 5px;
+  height: 9px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  cursor: pointer;
+}
+
+/* ---------- Tables */
+
+.editor-table {
+  width: 100%;
+  margin: 8px 0 16px;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.editor-table-cell {
+  min-width: 75px;
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.editor-table-cell-header {
+  background: var(--panel);
+  font-weight: 600;
+}
+
+.editor-table-cell-selected { background: rgba(51, 113, 255, 0.25); }
+.editor-table-selection *::selection { background: transparent; }
+
+/* ---------- Suggested edits */
+
+.editor-suggestion-insert {
+  color: #86efac;
+  background: rgba(34, 197, 94, 0.15);
+  text-decoration: underline #22c55e;
+}
+
+.editor-suggestion-delete {
+  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.12);
+  text-decoration: line-through #ef4444;
+}
+
+.suggestions-panel {
+  width: 100%;
+  max-width: 800px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+@media (min-width: 1024px) {
+  .suggestions-panel { width: 350px; }
+}
+
+.suggestion-item {
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: var(--toolbar);
+}
+
+/* ---------- Toolbar */
+
+.toolbar {
+  display: flex;
+  margin-bottom: 1px;
+  padding: 4px;
+  border-radius: 10px 10px 0 0;
+  background: var(--toolbar);
+}
+
+.toolbar .toolbar-item {
+  display: flex;
+  padding: 8px;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  cursor: pointer;
+}
+.toolbar .toolbar-item.spaced { margin-right: 2px; }
+.toolbar .toolbar-item:disabled { cursor: not-allowed; }
+.toolbar .toolbar-item.active,
+.toolbar .toolbar-item:hover:not(:disabled) { background: var(--panel); }
+
+.toolbar .toolbar-icon {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  color: #fff;
+  opacity: 0.6;
+}
+.toolbar .toolbar-item.active .toolbar-icon { opacity: 1; }
+.toolbar .toolbar-item:disabled .toolbar-icon { opacity: 0.2; }
+
+.toolbar .divider {
+  width: 1px;
+  margin: 0 4px;
+  background: var(--panel);
+}
+
+.toolbar .font-size-input {
+  width: 36px;
+  height: 28px;
+  margin-top: 3px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  outline: none;
+  background: transparent;
+  color: #fff;
+  font-size: 14px;
+  text-align: center;
+}
+.toolbar .font-size-input:focus { border-color: var(--accent); }

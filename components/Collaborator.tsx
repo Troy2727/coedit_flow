@@ -1,73 +1,51 @@
+'use client';
+
 import Image from 'next/image';
-import React, { useState } from 'react'
-import UserTypeSelector from './UserTypeSelector';
-import { Button } from './ui/button';
+import { useState } from 'react';
 import { removeCollaborator, updateDocumentAccess } from '@/lib/actions/room.actions';
+import { Button } from './ui/button';
+import UserTypeSelector from './UserTypeSelector';
 
-const Collaborator = ({ roomId, creatorId, collaborator, email, user }: CollaboratorProps) => {
-  const [userType, setUserType] = useState(collaborator.userType || 'viewer');
-  const [loading, setLoading] = useState(false);
+/** One person in the Share dialog: their role (editable unless they own the doc) and Remove. */
+export default function Collaborator({ roomId, creatorId, collaborator, email, user }: CollaboratorProps) {
+  const [role, setRole] = useState<UserType>(collaborator.userType ?? 'viewer');
+  const [busy, setBusy] = useState(false);
 
-  const shareDocumentHandler = async (type: string) => {
-    setLoading(true);
-
-    await updateDocumentAccess({ 
-      roomId, 
-      email, 
-      userType: type as UserType, 
-      updatedBy: user 
-    });
-
-    setLoading(false);
-  }
-
-  const removeCollaboratorHandler = async (email: string) => {
-    setLoading(true);
-
-    await removeCollaborator({ roomId, email });
-
-    setLoading(false);
-  }
+  const run = async (work: () => Promise<unknown>) => {
+    setBusy(true);
+    await work();
+    setBusy(false);
+  };
 
   return (
     <li className="flex items-center justify-between gap-2 py-3">
       <div className="flex gap-2">
-        <Image 
-          src={collaborator.avatar}
-          alt={collaborator.name}
-          width={36}
-          height={36}
-          className="size-9 rounded-full"
-        />
+        <Image src={collaborator.avatar} alt={collaborator.name} width={36} height={36} className="size-9 rounded-full" />
         <div>
           <p className="line-clamp-1 text-sm font-semibold leading-4 text-white">
             {collaborator.name}
-            <span className="text-10-regular pl-2 text-blue-100">
-              {loading && 'updating...'}
-            </span>
+            {busy && <span className="text-10-regular pl-2 text-blue-100">updating...</span>}
           </p>
-          <p className="text-sm font-light text-blue-100">
-            {collaborator.email}
-          </p>
+          <p className="text-sm font-light text-blue-100">{collaborator.email}</p>
         </div>
       </div>
 
-      {creatorId === collaborator.id ? (
+      {collaborator.id === creatorId ? (
         <p className="text-sm text-blue-100">Owner</p>
-      ): (
+      ) : (
         <div className="flex items-center">
-          <UserTypeSelector 
-            userType={userType as UserType}
-            setUserType={setUserType || 'viewer'}
-            onClickHandler={shareDocumentHandler}
+          <UserTypeSelector
+            userType={role}
+            setUserType={setRole}
+            onClickHandler={(next) =>
+              run(() => updateDocumentAccess({ roomId, email, userType: next as UserType, updatedBy: user }))
+            }
           />
-          <Button type="button" onClick={() => removeCollaboratorHandler(collaborator.email)}>
+          <Button type="button" onClick={() => run(() => removeCollaborator({ roomId, email: collaborator.email }))}>
             Remove
           </Button>
         </div>
       )}
     </li>
-  )
+  );
 }
-
-export default Collaborator

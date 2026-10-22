@@ -1,30 +1,6 @@
-/**
- * Copyright (c) Meta Platforms, Inc. and affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- */
+'use client';
+
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { mergeRegister } from '@lexical/utils';
-import {
-  $createParagraphNode,
-  $isRootOrShadowRoot,
-  $getSelection,
-  $isRangeSelection,
-  CAN_REDO_COMMAND,
-  CAN_UNDO_COMMAND,
-  FORMAT_ELEMENT_COMMAND,
-  FORMAT_TEXT_COMMAND,
-  REDO_COMMAND,
-  SELECTION_CHANGE_COMMAND,
-  UNDO_COMMAND,
-} from 'lexical';
-import {
-  $createHeadingNode,
-  $createQuoteNode,
-  $isHeadingNode,
-} from '@lexical/rich-text';
 import {
   $isListNode,
   INSERT_CHECK_LIST_COMMAND,
@@ -32,338 +8,231 @@ import {
   INSERT_UNORDERED_LIST_COMMAND,
   REMOVE_LIST_COMMAND,
 } from '@lexical/list';
+import { $createHeadingNode, $isHeadingNode } from '@lexical/rich-text';
 import { $setBlocksType } from '@lexical/selection';
-import { $findMatchingParent } from '@lexical/utils';
-import { List, ListChecks, ListOrdered } from 'lucide-react';
-import React from 'react';
-import LinkButton from './LinkButton';
-import ImageButton from './ImageButton';
-import SuggestEditButton from './SuggestEditButton';
-import TextStyleControls from './TextStyleControls';
-import TableControls from './TableControls';
+import { $findMatchingParent, mergeRegister } from '@lexical/utils';
 import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  useSyncExternalStore,
-} from 'react';
+  $createParagraphNode,
+  $getSelection,
+  $isRangeSelection,
+  $isRootOrShadowRoot,
+  CAN_REDO_COMMAND,
+  CAN_UNDO_COMMAND,
+  COMMAND_PRIORITY_LOW,
+  type ElementFormatType,
+  FORMAT_ELEMENT_COMMAND,
+  FORMAT_TEXT_COMMAND,
+  REDO_COMMAND,
+  type TextFormatType,
+  UNDO_COMMAND,
+} from 'lexical';
+import {
+  AlignCenter,
+  AlignJustify,
+  AlignLeft,
+  AlignRight,
+  Bold,
+  Heading1,
+  Heading2,
+  Heading3,
+  Italic,
+  List,
+  ListChecks,
+  ListOrdered,
+  type LucideIcon,
+  Redo2,
+  Strikethrough,
+  Underline,
+  Undo2,
+} from 'lucide-react';
+import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
+import ImageButton from './ImageButton';
+import LinkButton from './LinkButton';
+import SuggestEditButton from './SuggestEditButton';
+import TableControls from './TableControls';
+import TextStyleControls from './TextStyleControls';
 
-const LowPriority = 1;
+type Heading = 'h1' | 'h2' | 'h3';
+type ListKind = 'bullet' | 'number' | 'check';
 
-function Divider() {
-  return <div className="divider" />;
+// aria-labels are what screen readers announce and what the e2e tests click.
+const HEADINGS: { tag: Heading; label: string; icon: LucideIcon }[] = [
+  { tag: 'h1', label: 'Heading 1', icon: Heading1 },
+  { tag: 'h2', label: 'Heading 2', icon: Heading2 },
+  { tag: 'h3', label: 'Heading 3', icon: Heading3 },
+];
+
+const TEXT_FORMATS: { format: TextFormatType; label: string; title: string; icon: LucideIcon }[] = [
+  { format: 'bold', label: 'Format Bold', title: 'Bold (Ctrl+B)', icon: Bold },
+  { format: 'italic', label: 'Format Italics', title: 'Italic (Ctrl+I)', icon: Italic },
+  { format: 'underline', label: 'Format Underline', title: 'Underline (Ctrl+U)', icon: Underline },
+  { format: 'strikethrough', label: 'Format Strikethrough', title: 'Strikethrough', icon: Strikethrough },
+];
+
+const ALIGNMENTS: { align: ElementFormatType; label: string; title: string; icon: LucideIcon }[] = [
+  { align: 'left', label: 'Left Align', title: 'Align left', icon: AlignLeft },
+  { align: 'center', label: 'Center Align', title: 'Align center', icon: AlignCenter },
+  { align: 'right', label: 'Right Align', title: 'Align right', icon: AlignRight },
+  { align: 'justify', label: 'Justify Align', title: 'Justify', icon: AlignJustify },
+];
+
+const LISTS: { kind: ListKind; label: string; icon: LucideIcon }[] = [
+  { kind: 'check', label: 'Checklist', icon: ListChecks },
+  { kind: 'bullet', label: 'Bulleted list', icon: List },
+  { kind: 'number', label: 'Numbered list', icon: ListOrdered },
+];
+
+const LIST_COMMANDS = {
+  bullet: INSERT_UNORDERED_LIST_COMMAND,
+  number: INSERT_ORDERED_LIST_COMMAND,
+  check: INSERT_CHECK_LIST_COMMAND,
+};
+
+function ToolButton({
+  label,
+  title = label,
+  icon: Icon,
+  active = false,
+  disabled = false,
+  onClick,
+}: {
+  label: string;
+  title?: string;
+  icon: LucideIcon;
+  active?: boolean;
+  disabled?: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      className={`toolbar-item spaced${active ? ' active' : ''}`}
+      aria-label={label}
+      aria-pressed={active}
+      title={title}
+      disabled={disabled}
+      onClick={onClick}
+    >
+      <Icon className="toolbar-icon" />
+    </button>
+  );
 }
 
-export default function ToolbarPlugin() {
+const Divider = () => <div className="divider" aria-hidden />;
+
+/**
+ * The block type at the caret: 'h1'..'h3', 'bullet' | 'number' | 'check' for lists,
+ * otherwise the node type ('paragraph', 'quote'...). Re-renders on every editor update.
+ */
+function useCurrentBlock(): string | null {
   const [editor] = useLexicalComposerContext();
-  const toolbarRef = useRef(null);
+  const subscribe = useCallback((notify: () => void) => editor.registerUpdateListener(notify), [editor]);
+  const read = useCallback(
+    () =>
+      editor.getEditorState().read(() => {
+        const selection = $getSelection();
+        if (!$isRangeSelection(selection)) return null;
+        const node = selection.anchor.getNode();
+        const block =
+          node.getKey() === 'root'
+            ? node
+            : ($findMatchingParent(node, (n) => {
+                const parent = n.getParent();
+                return parent !== null && $isRootOrShadowRoot(parent);
+              }) ?? node.getTopLevelElementOrThrow());
+        if ($isHeadingNode(block)) return block.getTag();
+        if ($isListNode(block)) return block.getListType();
+        return block.getType();
+      }),
+    [editor],
+  );
+  return useSyncExternalStore(subscribe, read, read);
+}
+
+/** Text formats active on the current selection, plus undo/redo availability. */
+function useSelectionState() {
+  const [editor] = useLexicalComposerContext();
+  const [formats, setFormats] = useState<Set<TextFormatType>>(new Set());
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
-  const [isBold, setIsBold] = useState(false);
-  const [isItalic, setIsItalic] = useState(false);
-  const [isUnderline, setIsUnderline] = useState(false);
-  const [isStrikethrough, setIsStrikethrough] = useState(false);
-  const activeBlock = useActiveBlock();
 
-  const $updateToolbar = useCallback(() => {
-    const selection = $getSelection();
-    if ($isRangeSelection(selection)) {
-      // Update text format
-      setIsBold(selection.hasFormat('bold'));
-      setIsItalic(selection.hasFormat('italic'));
-      setIsUnderline(selection.hasFormat('underline'));
-      setIsStrikethrough(selection.hasFormat('strikethrough'));
-    }
-  }, []);
-
-  useEffect(() => {
-    return mergeRegister(
-      editor.registerUpdateListener(({ editorState }) => {
-        editorState.read(() => {
-          $updateToolbar();
-        });
-      }),
-      editor.registerCommand(
-        SELECTION_CHANGE_COMMAND,
-        (_payload, _newEditor) => {
-          $updateToolbar();
-          return false;
-        },
-        LowPriority,
+  useEffect(
+    () =>
+      mergeRegister(
+        editor.registerUpdateListener(({ editorState }) =>
+          editorState.read(() => {
+            const selection = $getSelection();
+            if ($isRangeSelection(selection)) {
+              setFormats(new Set(TEXT_FORMATS.map((f) => f.format).filter((f) => selection.hasFormat(f))));
+            }
+          }),
+        ),
+        editor.registerCommand(CAN_UNDO_COMMAND, (can) => (setCanUndo(can), false), COMMAND_PRIORITY_LOW),
+        editor.registerCommand(CAN_REDO_COMMAND, (can) => (setCanRedo(can), false), COMMAND_PRIORITY_LOW),
       ),
-      editor.registerCommand(
-        CAN_UNDO_COMMAND,
-        (payload) => {
-          setCanUndo(payload);
-          return false;
-        },
-        LowPriority,
-      ),
-      editor.registerCommand(
-        CAN_REDO_COMMAND,
-        (payload) => {
-          setCanRedo(payload);
-          return false;
-        },
-        LowPriority,
-      ),
-    );
-  }, [editor, $updateToolbar]);
+    [editor],
+  );
 
-  function toggleBlock(type: 'h1' | 'h2' | 'h3' | 'quote') {
-    const selection = $getSelection();
+  return { formats, canUndo, canRedo };
+}
 
-    if (activeBlock === type) {
-      return $setBlocksType(selection, () => $createParagraphNode());
-    }
+/** The editing toolbar above the document (editors only). */
+export default function ToolbarPlugin() {
+  const [editor] = useLexicalComposerContext();
+  const block = useCurrentBlock();
+  const { formats, canUndo, canRedo } = useSelectionState();
 
-    if (type === 'h1') {
-      return $setBlocksType(selection, () => $createHeadingNode('h1'));
-    }
+  // Clicking the active heading turns the block back into a paragraph.
+  const setHeading = (tag: Heading) =>
+    editor.update(() => {
+      const selection = $getSelection();
+      $setBlocksType(selection, () => (block === tag ? $createParagraphNode() : $createHeadingNode(tag)));
+    });
 
-    if (type === 'h2') {
-      return $setBlocksType(selection, () => $createHeadingNode('h2'));
-    }
-
-    if (type === 'h3') {
-      return $setBlocksType(selection, () => $createHeadingNode('h3'));
-    }
-
-    if (type === 'quote') {
-      return $setBlocksType(selection, () => $createQuoteNode());
-    }
-  }
-
-  function toggleList(type: 'bullet' | 'number' | 'check') {
-    if (activeBlock === type) {
-      return editor.dispatchCommand(REMOVE_LIST_COMMAND, undefined);
-    }
-
-    const command = {
-      bullet: INSERT_UNORDERED_LIST_COMMAND,
-      number: INSERT_ORDERED_LIST_COMMAND,
-      check: INSERT_CHECK_LIST_COMMAND,
-    }[type];
-
-    editor.dispatchCommand(command, undefined);
-  }
+  const toggleList = (kind: ListKind) =>
+    editor.dispatchCommand(block === kind ? REMOVE_LIST_COMMAND : LIST_COMMANDS[kind], undefined);
 
   return (
-    <div className="toolbar" ref={toolbarRef}>
-      <button
-        disabled={!canUndo}
-        onClick={() => {
-          editor.dispatchCommand(UNDO_COMMAND, undefined);
-        }}
-        className="toolbar-item spaced"
-        aria-label="Undo"
-        title="Undo (Ctrl+Z)"
-      >
-        <i className="format undo" />
-      </button>
-      <button
-        disabled={!canRedo}
-        onClick={() => {
-          editor.dispatchCommand(REDO_COMMAND, undefined);
-        }}
-        className="toolbar-item"
-        aria-label="Redo"
-        title="Redo (Ctrl+Y)"
-      >
-        <i className="format redo" />
-      </button>
+    <div className="toolbar" role="toolbar" aria-label="Formatting">
+      <ToolButton label="Undo" title="Undo (Ctrl+Z)" icon={Undo2} disabled={!canUndo} onClick={() => editor.dispatchCommand(UNDO_COMMAND, undefined)} />
+      <ToolButton label="Redo" title="Redo (Ctrl+Y)" icon={Redo2} disabled={!canRedo} onClick={() => editor.dispatchCommand(REDO_COMMAND, undefined)} />
       <Divider />
-      <button
-        onClick={() => editor.update(() => toggleBlock('h1'))}
-        data-active={activeBlock === 'h1' ? '' : undefined}
-        className={
-          'toolbar-item spaced ' + (activeBlock === 'h1' ? 'active' : '')
-        }
-        aria-label="Heading 1"
-        title="Heading 1"
-      >
-        <i className="format h1" />
-      </button>
-      <button
-        onClick={() => editor.update(() => toggleBlock('h2'))}
-        data-active={activeBlock === 'h2' ? '' : undefined}
-        className={
-          'toolbar-item spaced ' + (activeBlock === 'h2' ? 'active' : '')
-        }
-        aria-label="Heading 2"
-        title="Heading 2"
-      >
-        <i className="format h2" />
-      </button>
-      <button
-        onClick={() => editor.update(() => toggleBlock('h3'))}
-        data-active={activeBlock === 'h3' ? '' : undefined}
-        className={
-          'toolbar-item spaced ' + (activeBlock === 'h3' ? 'active' : '')
-        }
-        aria-label="Heading 3"
-        title="Heading 3"
-      >
-        <i className="format h3" />
-      </button>
+      {HEADINGS.map((h) => (
+        <ToolButton key={h.tag} label={h.label} icon={h.icon} active={block === h.tag} onClick={() => setHeading(h.tag)} />
+      ))}
       <Divider />
-      <button
-        onClick={() => {
-          editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold');
-        }}
-        className={'toolbar-item spaced ' + (isBold ? 'active' : '')}
-        aria-label="Format Bold"
-        title="Bold (Ctrl+B)"
-      >
-        <i className="format bold" />
-      </button>
-      <button
-        onClick={() => {
-          editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic');
-        }}
-        className={'toolbar-item spaced ' + (isItalic ? 'active' : '')}
-        aria-label="Format Italics"
-        title="Italic (Ctrl+I)"
-      >
-        <i className="format italic" />
-      </button>
-      <button
-        onClick={() => {
-          editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'underline');
-        }}
-        className={'toolbar-item spaced ' + (isUnderline ? 'active' : '')}
-        aria-label="Format Underline"
-        title="Underline (Ctrl+U)"
-      >
-        <i className="format underline" />
-      </button>
-      <button
-        onClick={() => {
-          editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'strikethrough');
-        }}
-        className={'toolbar-item spaced ' + (isStrikethrough ? 'active' : '')}
-        aria-label="Format Strikethrough"
-        title="Strikethrough"
-      >
-        <i className="format strikethrough" />
-      </button>
+      {TEXT_FORMATS.map((f) => (
+        <ToolButton
+          key={f.format}
+          label={f.label}
+          title={f.title}
+          icon={f.icon}
+          active={formats.has(f.format)}
+          onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, f.format)}
+        />
+      ))}
       <Divider />
       <TextStyleControls />
       <LinkButton />
       <ImageButton />
       <SuggestEditButton />
       <Divider />
-      <button
-        onClick={() => {
-          editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'left');
-        }}
-        className="toolbar-item spaced"
-        aria-label="Left Align"
-        title="Align left"
-      >
-        <i className="format left-align" />
-      </button>
-      <button
-        onClick={() => {
-          editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'center');
-        }}
-        className="toolbar-item spaced"
-        aria-label="Center Align"
-        title="Align center"
-      >
-        <i className="format center-align" />
-      </button>
-      <button
-        onClick={() => {
-          editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'right');
-        }}
-        className="toolbar-item spaced"
-        aria-label="Right Align"
-        title="Align right"
-      >
-        <i className="format right-align" />
-      </button>
-      <button
-        onClick={() => {
-          editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'justify');
-        }}
-        className="toolbar-item"
-        aria-label="Justify Align"
-        title="Justify"
-      >
-        <i className="format justify-align" />
-      </button>
+      {ALIGNMENTS.map((a) => (
+        <ToolButton
+          key={a.align}
+          label={a.label}
+          title={a.title}
+          icon={a.icon}
+          onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, a.align)}
+        />
+      ))}
       <Divider />
-      <button
-        onClick={() => toggleList('check')}
-        className={'toolbar-item spaced ' + (activeBlock === 'check' ? 'active' : '')}
-        aria-label="Checklist"
-        title="Checklist"
-      >
-        <ListChecks className="toolbar-icon" />
-      </button>
-      <button
-        onClick={() => toggleList('bullet')}
-        className={'toolbar-item spaced ' + (activeBlock === 'bullet' ? 'active' : '')}
-        aria-label="Bulleted list"
-        title="Bulleted list"
-      >
-        <List className="toolbar-icon" />
-      </button>
-      <button
-        onClick={() => toggleList('number')}
-        className={'toolbar-item ' + (activeBlock === 'number' ? 'active' : '')}
-        aria-label="Numbered list"
-        title="Numbered list"
-      >
-        <ListOrdered className="toolbar-icon" />
-      </button>
+      {LISTS.map((l) => (
+        <ToolButton key={l.kind} label={l.label} icon={l.icon} active={block === l.kind} onClick={() => toggleList(l.kind)} />
+      ))}
       <Divider />
-      <TableControls />{' '}
+      <TableControls />
     </div>
   );
 }
 
-function useActiveBlock() {
-  const [editor] = useLexicalComposerContext();
-
-  const subscribe = useCallback(
-    (onStoreChange: () => void) => {
-      return editor.registerUpdateListener(onStoreChange);
-    },
-    [editor],
-  );
-
-  const getSnapshot = useCallback(() => {
-    return editor.getEditorState().read(() => {
-      const selection = $getSelection();
-      if (!$isRangeSelection(selection)) return null;
-
-      const anchor = selection.anchor.getNode();
-      let element =
-        anchor.getKey() === 'root'
-          ? anchor
-          : $findMatchingParent(anchor, (e) => {
-              const parent = e.getParent();
-              return parent !== null && $isRootOrShadowRoot(parent);
-            });
-
-      if (element === null) {
-        element = anchor.getTopLevelElementOrThrow();
-      }
-
-      if ($isHeadingNode(element)) {
-        return element.getTag();
-      }
-
-      if ($isListNode(element)) {
-        return element.getListType();
-      }
-
-      return element.getType();
-    });
-  }, [editor]);
-
-  return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
-}

@@ -1,50 +1,42 @@
-import CollaborativeRoom from "@/components/CollaborativeRoom"
-import { getDocument } from "@/lib/actions/room.actions";
-import { getClerkUsers } from "@/lib/actions/user.actions";
-import { currentUser } from "@clerk/nextjs/server"
-import { redirect } from "next/navigation";
+import { currentUser } from '@clerk/nextjs/server';
+import { redirect } from 'next/navigation';
+import CollaborativeRoom from '@/components/CollaborativeRoom';
+import { getDocument } from '@/lib/actions/room.actions';
+import { getClerkUsers } from '@/lib/actions/user.actions';
 
-const Document = async ({ params: { id } }: SearchParamProps) => {
-  const clerkUser = await currentUser();
-  if(!clerkUser) redirect('/modern-sign-in');
+const canWrite = (access: string[] | null | undefined) => Boolean(access?.includes('room:write'));
 
-  const room = await getDocument({
-    roomId: id,
-    userId: clerkUser.emailAddresses[0].emailAddress,
-  });
+/** Loads a document and everyone who has access, then hands off to the live room. */
+export default async function DocumentPage({ params: { id } }: SearchParamProps) {
+  const user = await currentUser();
+  if (!user) redirect('/modern-sign-in');
+  const email = user.emailAddresses[0].emailAddress;
 
-  if(!room) redirect('/');
+  const room = await getDocument({ roomId: id, userId: email });
+  if (!room) redirect('/');
 
-  const userIds = Object.keys(room.usersAccesses);
-  const users: (User | undefined)[] = (await getClerkUsers({ userIds })) ?? [];
+  const emails = Object.keys(room.usersAccesses);
+  const accounts: (User | undefined)[] = (await getClerkUsers({ userIds: emails })) ?? [];
+  const people: User[] = emails.map((address, i) => ({
+    // People invited before they signed up have no account yet; show them by email.
+    ...(accounts[i] ?? { id: address, name: 'Pending invite', email: address, avatar: '/assets/icons/user.svg', color: '' }),
+    userType: canWrite(room.usersAccesses[address]) ? 'editor' : 'viewer',
+  }));
 
-  // Someone invited before signing up has no Clerk user yet; list them by email
-  const usersData: User[] = userIds.map((email, i) => ({
-    ...(users[i] ?? { id: email, name: 'Pending invite', email, avatar: '/assets/icons/user.svg', color: '' }),
-    userType: room.usersAccesses[email]?.includes('room:write')
-      ? 'editor'
-      : 'viewer'
-  }))
-
-  // Invited users get their own access; everyone else falls back to link sharing (defaultAccesses)
-  const currentUserAccess = room.usersAccesses[clerkUser.emailAddresses[0].emailAddress] ?? room.defaultAccesses;
-  const currentUserType = currentUserAccess.includes('room:write') ? 'editor' : 'viewer';
-
-  const generalAccess: GeneralAccess = room.defaultAccesses.length === 0
-    ? 'restricted'
-    : room.defaultAccesses.includes('room:write') ? 'editor' : 'viewer';
+  // Direct access wins; otherwise the user is here through link sharing.
+  const myAccess = room.usersAccesses[email] ?? room.defaultAccesses;
+  const linkAccess: GeneralAccess =
+    room.defaultAccesses.length === 0 ? 'restricted' : canWrite(room.defaultAccesses) ? 'editor' : 'viewer';
 
   return (
     <main className="flex w-full flex-col items-center">
       <CollaborativeRoom
         roomId={id}
         roomMetadata={room.metadata}
-        users={usersData}
-        currentUserType={currentUserType}
-        generalAccess={generalAccess}
+        users={people}
+        currentUserType={canWrite(myAccess) ? 'editor' : 'viewer'}
+        generalAccess={linkAccess}
       />
     </main>
-  )
+  );
 }
-
-export default Document
