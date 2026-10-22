@@ -97,7 +97,7 @@ test('capture README screenshots', async ({ page, browser }) => {
 
   // A comment thread on the load-testing risk
   await selectPhrase(page, 'Load testing for real-time editing');
-  await page.getByAltText('comment').click();
+  await page.getByRole('button', { name: 'Comment', exact: true }).click();
   await page.keyboard.type('Can we run this against staging before the beta?');
   await page.keyboard.press('Enter');
   await expect(page.locator('.comment-thread')).toBeVisible();

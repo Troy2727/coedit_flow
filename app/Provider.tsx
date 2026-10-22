@@ -1,37 +1,25 @@
 'use client';
 
-import Loader from '@/components/Loader';
-import { getClerkUsers, getDocumentUsers } from '@/lib/actions/user.actions';
 import { useUser } from '@clerk/nextjs';
 import { ClientSideSuspense, LiveblocksProvider } from '@liveblocks/react/suspense';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
+import Loader from '@/components/Loader';
+import { getClerkUsers, getDocumentUsers } from '@/lib/actions/user.actions';
 
-const Provider = ({ children }: { children: ReactNode}) => {
-  const { user: clerkUser } = useUser();
+/** Connects the app to Liveblocks and tells it how to look up people for avatars and @mentions. */
+export default function Provider({ children }: { children: ReactNode }) {
+  const { user } = useUser();
+  const myEmail = user?.emailAddresses[0].emailAddress ?? '';
 
   return (
-    <LiveblocksProvider 
+    <LiveblocksProvider
       authEndpoint="/api/liveblocks-auth"
-      resolveUsers={async ({ userIds }) => {
-        const users = await getClerkUsers({ userIds});
-
-        return users;
-      }}
-      resolveMentionSuggestions={async ({ text, roomId }) => {
-        const roomUsers = await getDocumentUsers({
-          roomId,
-          currentUser: clerkUser?.emailAddresses[0].emailAddress!,
-          text,
-        })
-
-        return roomUsers;
-      }}
+      resolveUsers={({ userIds }) => getClerkUsers({ userIds })}
+      resolveMentionSuggestions={async ({ text, roomId }) =>
+        (await getDocumentUsers({ roomId, currentUser: myEmail, text })) ?? []
+      }
     >
-      <ClientSideSuspense fallback={<Loader />}>
-        {children}
-      </ClientSideSuspense>
+      <ClientSideSuspense fallback={<Loader />}>{children}</ClientSideSuspense>
     </LiveblocksProvider>
-  )
+  );
 }
-
-export default Provider
