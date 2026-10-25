@@ -26,8 +26,8 @@
 <br />
 
 <p align="center">
-  <a href="https://github.com/Troy2727/coedit_flow/blob/main/docs/images/editor.png" title="Open this image full size">
-    <img src="docs/images/editor.png" alt="The LiveDocs editor with a second collaborator's live cursor, a comment thread, and the document outline" width="100%" />
+  <a href="https://github.com/Troy2727/coedit_flow/blob/main/docs/diagrams/renders/editor.gif" title="Open this image full size">
+    <img src="docs/diagrams/renders/editor.gif" alt="The LiveDocs editor with a second collaborator's live cursor, a comment thread, and the document outline" width="100%" />
   </a>
   <br />
   <sub>Click the image to see it full size.</sub>
@@ -98,8 +98,8 @@
 **Sharing: invite by email, choose a role, or share by link**
 
 <p align="center">
-  <a href="https://github.com/Troy2727/coedit_flow/blob/main/docs/images/sharing.png" title="Open this image full size">
-    <img src="docs/images/sharing.png" alt="Share dialog with an invited editor and &quot;Anyone with the link can view&quot; access" width="100%" />
+  <a href="https://github.com/Troy2727/coedit_flow/blob/main/docs/diagrams/renders/sharing.gif" title="Open this image full size">
+    <img src="docs/diagrams/renders/sharing.gif" alt="Share dialog with an invited editor and &quot;Anyone with the link can view&quot; access" width="100%" />
   </a>
   <br />
   <sub>Click the image to see it full size.</sub>
@@ -108,8 +108,8 @@
 **Version history: preview any saved version and restore it**
 
 <p align="center">
-  <a href="https://github.com/Troy2727/coedit_flow/blob/main/docs/images/version-history.png" title="Open this image full size">
-    <img src="docs/images/version-history.png" alt="Version history panel showing a saved version and its preview" width="100%" />
+  <a href="https://github.com/Troy2727/coedit_flow/blob/main/docs/diagrams/renders/version-history.gif" title="Open this image full size">
+    <img src="docs/diagrams/renders/version-history.gif" alt="Version history panel showing a saved version and its preview" width="100%" />
   </a>
   <br />
   <sub>Click the image to see it full size.</sub>
@@ -118,8 +118,18 @@
 **Home: all documents, searchable and sorted by last opened**
 
 <p align="center">
-  <a href="https://github.com/Troy2727/coedit_flow/blob/main/docs/images/home.png" title="Open this image full size">
-    <img src="docs/images/home.png" alt="Documents home page with a search box and a list of documents" width="100%" />
+  <a href="https://github.com/Troy2727/coedit_flow/blob/main/docs/diagrams/renders/home.gif" title="Open this image full size">
+    <img src="docs/diagrams/renders/home.gif" alt="Documents home page with a search box and a list of documents" width="100%" />
+  </a>
+  <br />
+  <sub>Click the image to see it full size.</sub>
+</p>
+
+**Sign-in: Google, or email and password**
+
+<p align="center">
+  <a href="https://github.com/Troy2727/coedit_flow/blob/main/docs/diagrams/renders/sign-in.gif" title="Open this image full size">
+    <img src="docs/diagrams/renders/sign-in.gif" alt="LiveDocs sign-in page with Continue with Google, email and password fields, and a sign-up link" width="100%" />
   </a>
   <br />
   <sub>Click the image to see it full size.</sub>

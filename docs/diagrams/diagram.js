@@ -126,5 +126,34 @@ window.LiveDocsDiagram = (function () {
     return f.tl;
   }
 
-  return { boxes };
+  /**
+   * A 1600×1000 app screenshot shown at 80% in a card; then each callout outlines one area
+   * (given in screenshot pixels) and a label glows in at (lx, ly), also in screenshot pixels.
+   */
+  function screen(root, title, { src, alt, callouts }) {
+    const f = frame(root, title);
+    const X = 160, Y = 175, S = 0.8;
+    const card = html(root, "shot", { left: `${X}px`, top: `${Y}px` }, `<img src="${src}" alt="${alt}" />`);
+    root.appendChild(f.svg); // outlines draw above the card
+    f.tl.fromTo(card, { opacity: 0, y: 30, scale: 0.97 }, { opacity: 1, y: 0, scale: 1, duration: 0.7, ease: "power2.out" }, 0.4);
+
+    let t = 1.7;
+    for (const c of callouts) {
+      const ring = el("rect", {
+        x: X + c.x * S, y: Y + c.y * S, width: c.w * S, height: c.h * S, rx: 12,
+        fill: "none", stroke: BLUE, "stroke-width": 3.5, filter: "url(#glow)",
+      }, f.svg);
+      const len = 2 * (c.w + c.h) * S;
+      ring.setAttribute("stroke-dasharray", `${len} ${len}`);
+      f.tl.fromTo(ring, { attr: { "stroke-dashoffset": len } }, { attr: { "stroke-dashoffset": 0 }, duration: 0.6, ease: "power1.inOut" }, t);
+      const label = html(root, "callout", { left: `${X + c.lx * S}px`, top: `${Y + c.ly * S}px` }, c.label);
+      glowIn(f, label, t + 0.4);
+      t += 1.0;
+    }
+    const total = Number(root.dataset.duration);
+    f.tl.to({}, { duration: Math.max(0, total - f.tl.duration()) });
+    return f.tl;
+  }
+
+  return { boxes, screen };
 })();

@@ -99,6 +99,33 @@ svg.wires {
   line-height: 1.35;
   color: var(--muted);
 }
+.shot {
+  position: absolute;
+  width: 1280px;
+  height: 800px;
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.5);
+}
+.shot img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.callout {
+  position: absolute;
+  padding: 8px 16px;
+  border: 1.5px solid #417bff;
+  border-radius: 10px;
+  background: #0b1527;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  font-family: var(--font-mono);
+  font-size: 24px;
+  font-weight: 500;
+  color: #e2e8f0;
+  white-space: nowrap;
+}
 .group-label {
   position: absolute;
   font-family: var(--font-mono);

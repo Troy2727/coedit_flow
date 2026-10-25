@@ -1,0 +1,54 @@
+<!doctype html>
+<!-- README screenshot animation (HyperFrames). Render from docs/: npx hyperframes@0.8.166 render . -c diagrams/screens/sign-in.html -->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1600, height=1150" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Manrope:wght@500;600;700;800&display=block"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../diagram.css" />
+  </head>
+  <body>
+    <div id="sign-in" data-composition-id="main" data-start="0" data-duration="8" data-width="1600" data-height="1150">
+      <script src="../diagram.js"></script>
+      <script>
+        window.__timelines["main"] = LiveDocsDiagram.screen(document.getElementById("sign-in"), "Sign in with Google or email", {
+            "src": "../../images/sign-in.png",
+            "alt": "LiveDocs sign-in page with Continue with Google, email and password fields, and a sign-up link",
+            "callouts": [
+              {
+                "x": 972,
+                "y": 353,
+                "w": 456,
+                "h": 54,
+                "label": "Google sign-in",
+                "lx": 640,
+                "ly": 360
+              },
+              {
+                "x": 970,
+                "y": 460,
+                "w": 460,
+                "h": 174,
+                "label": "email + password",
+                "lx": 600,
+                "ly": 530
+              },
+              {
+                "x": 1086,
+                "y": 708,
+                "w": 228,
+                "h": 28,
+                "label": "new here? sign up",
+                "lx": 700,
+                "ly": 702
+              }
+            ]
+          });
+      </script>
+    </div>
+  </body>
+</html>

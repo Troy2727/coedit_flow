@@ -1,0 +1,54 @@
+<!doctype html>
+<!-- README screenshot animation (HyperFrames). Render from docs/: npx hyperframes@0.8.166 render . -c diagrams/screens/version-history.html -->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1600, height=1150" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Manrope:wght@500;600;700;800&display=block"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../diagram.css" />
+  </head>
+  <body>
+    <div id="version-history" data-composition-id="main" data-start="0" data-duration="8" data-width="1600" data-height="1150">
+      <script src="../diagram.js"></script>
+      <script>
+        window.__timelines["main"] = LiveDocsDiagram.screen(document.getElementById("version-history"), "Restore any version", {
+            "src": "../../images/version-history.png",
+            "alt": "Version history panel showing a saved version and its preview",
+            "callouts": [
+              {
+                "x": 1081,
+                "y": 96,
+                "w": 178,
+                "h": 48,
+                "label": "save a version",
+                "lx": 705,
+                "ly": 96
+              },
+              {
+                "x": 1003,
+                "y": 152,
+                "w": 288,
+                "h": 262,
+                "label": "saved versions",
+                "lx": 1015,
+                "ly": 428
+              },
+              {
+                "x": 876,
+                "y": 842,
+                "w": 102,
+                "h": 46,
+                "label": "restore for all",
+                "lx": 500,
+                "ly": 846
+              }
+            ]
+          });
+      </script>
+    </div>
+  </body>
+</html>
