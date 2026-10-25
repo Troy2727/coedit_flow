@@ -1,5 +1,9 @@
 <div align="center">
-  <img src="docs/diagrams/renders/banner.gif" alt="LiveDocs banner" width="100%" />
+  <a href="https://github.com/Troy2727/coedit_flow/blob/main/docs/diagrams/renders/banner.gif" title="Open this image full size">
+    <img src="docs/diagrams/renders/banner.gif" alt="LiveDocs banner" width="100%" />
+  </a>
+  <br />
+  <sub>Click the image to see it full size.</sub>
   <br />
   <br />
   <p>
