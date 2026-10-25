@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/eaaeb1f0-22da-46be-9e29-9bef70e0039d" alt="LiveDocs banner" width="100%" />
+  <img src="docs/diagrams/renders/banner.gif" alt="LiveDocs banner" width="100%" />
   <br />
   <br />
   <p>
