@@ -1,0 +1,54 @@
+<!doctype html>
+<!-- README screenshot animation (HyperFrames). Render from docs/: npx hyperframes@0.8.166 render . -c diagrams/screens/home.html -->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1600, height=1150" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Manrope:wght@500;600;700;800&display=block"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../diagram.css" />
+  </head>
+  <body>
+    <div id="home" data-composition-id="main" data-start="0" data-duration="8" data-width="1600" data-height="1150">
+      <script src="../diagram.js"></script>
+      <script>
+        window.__timelines["main"] = LiveDocsDiagram.screen(document.getElementById("home"), "All your documents", {
+            "src": "../../images/home.png",
+            "alt": "Documents home page with a search box and a list of documents",
+            "callouts": [
+              {
+                "x": 946,
+                "y": 130,
+                "w": 223,
+                "h": 48,
+                "label": "new document",
+                "lx": 1185,
+                "ly": 134
+              },
+              {
+                "x": 431,
+                "y": 210,
+                "w": 738,
+                "h": 50,
+                "label": "search",
+                "lx": 1185,
+                "ly": 214
+              },
+              {
+                "x": 431,
+                "y": 292,
+                "w": 738,
+                "h": 220,
+                "label": "last opened first",
+                "lx": 1185,
+                "ly": 380
+              }
+            ]
+          });
+      </script>
+    </div>
+  </body>
+</html>

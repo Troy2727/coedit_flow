@@ -1,0 +1,54 @@
+<!doctype html>
+<!-- README screenshot animation (HyperFrames). Render from docs/: npx hyperframes@0.8.166 render . -c diagrams/screens/editor.html -->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1600, height=1150" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Manrope:wght@500;600;700;800&display=block"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../diagram.css" />
+  </head>
+  <body>
+    <div id="editor" data-composition-id="main" data-start="0" data-duration="8" data-width="1600" data-height="1150">
+      <script src="../diagram.js"></script>
+      <script>
+        window.__timelines["main"] = LiveDocsDiagram.screen(document.getElementById("editor"), "Edit together, live", {
+            "src": "../../images/editor.png",
+            "alt": "The LiveDocs editor with a second collaborator's live cursor, a comment thread, and the document outline",
+            "callouts": [
+              {
+                "x": 556,
+                "y": 472,
+                "w": 96,
+                "h": 50,
+                "label": "another editor's cursor",
+                "lx": 668,
+                "ly": 428
+              },
+              {
+                "x": 1160,
+                "y": 290,
+                "w": 360,
+                "h": 204,
+                "label": "comment thread",
+                "lx": 1170,
+                "ly": 512
+              },
+              {
+                "x": 72,
+                "y": 178,
+                "w": 175,
+                "h": 130,
+                "label": "outline",
+                "lx": 80,
+                "ly": 322
+              }
+            ]
+          });
+      </script>
+    </div>
+  </body>
+</html>
