@@ -107,11 +107,39 @@
 
 <p align="center">
   <a href="https://github.com/Troy2727/coedit_flow/blob/main/docs/diagrams/renders/architecture.gif" title="Open this diagram full size">
-    <img src="docs/diagrams/renders/architecture.gif" alt="LiveDocs architecture: the Lexical editor in the browser syncs live edits, cursors and comments with Liveblocks over a WebSocket. It gets a room token from the Next.js auth route and calls server actions to rename, share, delete and save versions. Both verify the session with Clerk; the auth route identifies the user to Liveblocks and server actions use the Liveblocks REST API." width="100%" />
+    <img src="docs/diagrams/renders/architecture.gif" alt="LiveDocs architecture: the Lexical editor in the browser syncs document updates, cursors and comments with Liveblocks over a WebSocket; it gets a room token from the auth route and calls server actions to rename, share, delete and save versions; both verify the session with Clerk and talk to Liveblocks." width="100%" />
   </a>
   <br />
   <sub>Click the diagram to see it full size.</sub>
 </p>
+
+<details>
+<summary>Editable Mermaid version</summary>
+
+```mermaid
+flowchart LR
+  subgraph Browser["Browser (Next.js client)"]
+    Editor["Lexical editor<br/>+ Liveblocks React"]
+  end
+
+  subgraph Server["Next.js server"]
+    Actions["Server actions<br/>(documents, sharing, versions)"]
+    AuthRoute["/api/liveblocks-auth"]
+  end
+
+  Clerk["Clerk<br/>(sign-in, sessions, users)"]
+  Liveblocks["Liveblocks<br/>(Yjs CRDT sync, presence,<br/>comments, versions, rooms)"]
+
+  Editor <-- "WebSocket: document updates,<br/>cursors, comments" --> Liveblocks
+  Editor -- "get room token" --> AuthRoute
+  Editor -- "rename, share, delete, save version" --> Actions
+  AuthRoute -- "verify session" --> Clerk
+  Actions -- "verify session + role" --> Clerk
+  AuthRoute -- "identify user" --> Liveblocks
+  Actions -- "REST: rooms, access lists, versions" --> Liveblocks
+```
+
+</details>
 
 - **Each document is a Liveblocks room.** The room holds the Yjs document, comments, and versions. Its metadata holds the title and owner, and its access lists hold who can view or edit. There's no separate database.
 - **The editor syncs directly with Liveblocks** over a WebSocket. The Next.js server is only involved to issue a room token and to perform privileged actions.
@@ -221,7 +249,7 @@ e2e/                              Playwright end-to-end tests
 
 **Alex Mieses** · [GitHub](https://github.com/Troy2727)
 
-LiveDocs began as JavaScript Mastery's [collaborative-editor](https://github.com/adrianhajdin/collaborative-editor) course project. The codebase has since been rewritten, and version history, suggestions, tables, images, export, link sharing, email invitations, server-side permission checks and the Playwright suite were built for LiveDocs.
+Alex built LiveDocs as a complete product, not just an editor demo: real-time co-editing on Yjs CRDTs with live cursors and comments, suggested edits, version history, tables, images and export, link sharing and email invitations, and permission checks on the server for every action. A Playwright suite signs in two real browsers to prove that edits and cursors sync live, CI runs it on every push to `main`, and the app is live on [Vercel](https://coeditflow.vercel.app).
 
 ---
 
