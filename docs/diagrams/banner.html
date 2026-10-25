@@ -1,0 +1,108 @@
+<!doctype html>
+<!--
+  README banner (HyperFrames): the title glows in, then the editor screenshot slides in and
+  rings trace a collaborator's cursor and a comment thread.
+    Render (from docs/): npx hyperframes@0.8.166 render . -c diagrams/banner.html --format png-sequence --output diagrams/frames/banner
+            ffmpeg -framerate 30 -i diagrams/frames/banner/frame_%06d.png -vf "format=rgb24,fps=15,split[a][b];[a]palettegen=max_colors=256:stats_mode=full:reserve_transparent=0[p];[b][p]paletteuse=dither=none:diff_mode=rectangle" -loop 0 diagrams/renders/banner.gif
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1600, height=462" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Manrope:wght@500;600;700;800&display=block"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="diagram.css" />
+    <style>
+      html,
+      body,
+      .scene {
+        width: 1600px;
+        height: 462px;
+      }
+      .title {
+        position: absolute;
+        left: 100px;
+        top: 108px;
+        font-size: 108px;
+        font-weight: 800;
+        line-height: 1.08;
+        letter-spacing: -0.035em;
+      }
+      .title .blue {
+        color: #3371ff;
+      }
+      .banner-shot {
+        position: absolute;
+        left: 830px;
+        top: 46px;
+        width: 800px;
+        height: 500px;
+        border: 1.5px solid var(--border);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55);
+        transform-origin: 0% 50%;
+      }
+      .banner-shot img,
+      .banner-shot svg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="banner" class="scene" data-composition-id="main" data-start="0" data-duration="7" data-width="1600" data-height="462">
+      <div class="title"><div class="blue">LiveDocs</div><div>Application</div></div>
+      <div class="banner-shot">
+        <img src="../images/editor.png" alt="The LiveDocs editor" />
+        <svg viewBox="0 0 1600 1000">
+          <defs>
+            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="5" result="blur" />
+              <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+            </filter>
+          </defs>
+          <!-- screenshot pixels, same areas as screens/editor.html -->
+          <rect class="ring" x="556" y="472" width="96" height="50" rx="12" />
+          <rect class="ring" x="1160" y="290" width="360" height="204" rx="12" />
+        </svg>
+      </div>
+      <script>
+        (function () {
+          const root = document.getElementById("banner");
+          const GLOW_ON = "drop-shadow(0 0 18px rgba(65, 123, 255, 0.95))";
+          const GLOW_OFF = "drop-shadow(0 0 0px rgba(65, 123, 255, 0))";
+          const [live, app] = root.querySelectorAll(".title > div");
+          const card = root.querySelector(".banner-shot");
+          const rings = root.querySelectorAll(".ring");
+          const tl = gsap.timeline({ paused: true });
+
+          [live, app].forEach((word, i) => {
+            const at = 0.3 + i * 0.45;
+            tl.fromTo(word, { opacity: 0, y: 14, filter: GLOW_ON }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, at);
+            tl.to(word, { filter: GLOW_OFF, duration: 0.9, ease: "power1.out" }, at + 0.5);
+          });
+          tl.fromTo(
+            card,
+            { opacity: 0, x: 80, rotationY: -4, transformPerspective: 1400 },
+            { opacity: 1, x: 0, rotationY: -12, transformPerspective: 1400, duration: 0.9, ease: "power2.out" },
+            1.1
+          );
+          rings.forEach((ring, i) => {
+            const len = 2 * (Number(ring.getAttribute("width")) + Number(ring.getAttribute("height")));
+            Object.entries({ fill: "none", stroke: "#417bff", "stroke-width": 5, filter: "url(#glow)", "stroke-dasharray": `${len} ${len}` })
+              .forEach(([k, v]) => ring.setAttribute(k, v));
+            tl.fromTo(ring, { attr: { "stroke-dashoffset": len } }, { attr: { "stroke-dashoffset": 0 }, duration: 0.6, ease: "power1.inOut" }, 2.4 + i * 0.9);
+          });
+          tl.to({}, { duration: Math.max(0, Number(root.dataset.duration) - tl.duration()) });
+          window.__timelines["main"] = tl;
+        })();
+      </script>
+    </div>
+  </body>
+</html>
