@@ -1,0 +1,47 @@
+<!doctype html>
+<!--
+  README architecture diagram (HyperFrames), drawn from the Mermaid diagram it replaced.
+    Check:  npx hyperframes@0.8.166 check .
+    Render: npx hyperframes@0.8.166 render . --format png-sequence --output frames
+            ffmpeg -framerate 30 -i frames/frame_%06d.png -vf "format=rgb24,fps=15,split[a][b];[a]palettegen=max_colors=256:stats_mode=full:reserve_transparent=0[p];[b][p]paletteuse=dither=none:diff_mode=rectangle" -loop 0 renders/architecture.gif
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1600, height=1150" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Manrope:wght@500;600;700;800&display=block"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="diagram.css" />
+  </head>
+  <body>
+    <div id="architecture" data-composition-id="main" data-start="0" data-duration="12" data-width="1600" data-height="1150">
+      <script src="diagram.js"></script>
+      <script>
+        window.__timelines["main"] = LiveDocsDiagram.boxes(document.getElementById("architecture"), "How LiveDocs works", {
+          groups: [
+            { x1: 40, y1: 290, x2: 400, y2: 770, label: "BROWSER" },
+            { x1: 620, y1: 290, x2: 1000, y2: 770, label: "NEXT.JS SERVER" },
+          ],
+          nodes: [
+            { x: 70, y: 360, w: 300, h: 380, title: "Editor", sub: "Lexical<br>+ Liveblocks React" },
+            { x: 650, y: 360, w: 320, h: 130, title: "Auth route", sub: "/api/liveblocks-auth" },
+            { x: 650, y: 600, w: 320, h: 140, title: "Server actions", sub: "documents · sharing<br>versions" },
+            { x: 1220, y: 360, w: 340, h: 380, title: "Liveblocks", sub: "Yjs CRDT sync<br>presence · comments<br>versions · rooms" },
+            { x: 650, y: 870, w: 320, h: 130, title: "Clerk", sub: "sign-in · sessions · users" },
+          ],
+          links: [
+            { d: "M370 425 L644 425", label: "room token", lx: 495, ly: 405 },
+            { d: "M810 770 L810 864", label: "verify session", lx: 830, ly: 826, anchor: "start" },
+            { d: "M970 425 L1214 425", label: "identify user", lx: 1092, ly: 405 },
+            { d: "M220 356 L220 215 L1390 215 L1390 356", label: "WebSocket · live edits, cursors, comments", lx: 805, ly: 195, both: true, duration: 1.4 },
+            { d: "M370 670 L644 670", label: "doc actions", lx: 495, ly: 650 },
+            { d: "M970 670 L1214 670", label: "REST API", lx: 1092, ly: 650 },
+          ],
+        });
+      </script>
+    </div>
+  </body>
+</html>

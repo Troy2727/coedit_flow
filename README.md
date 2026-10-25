@@ -105,28 +105,13 @@
 
 ## 🏗️ Architecture
 
-```mermaid
-flowchart LR
-  subgraph Browser["Browser (Next.js client)"]
-    Editor["Lexical editor<br/>+ Liveblocks React"]
-  end
-
-  subgraph Server["Next.js server"]
-    Actions["Server actions<br/>(documents, sharing, versions)"]
-    AuthRoute["/api/liveblocks-auth"]
-  end
-
-  Clerk["Clerk<br/>(sign-in, sessions, users)"]
-  Liveblocks["Liveblocks<br/>(Yjs CRDT sync, presence,<br/>comments, versions, rooms)"]
-
-  Editor <-- "WebSocket: document updates,<br/>cursors, comments" --> Liveblocks
-  Editor -- "get room token" --> AuthRoute
-  Editor -- "rename, share, delete, save version" --> Actions
-  AuthRoute -- "verify session" --> Clerk
-  Actions -- "verify session + role" --> Clerk
-  AuthRoute -- "identify user" --> Liveblocks
-  Actions -- "REST: rooms, access lists, versions" --> Liveblocks
-```
+<p align="center">
+  <a href="https://github.com/Troy2727/coedit_flow/blob/main/docs/diagrams/renders/architecture.gif" title="Open this diagram full size">
+    <img src="docs/diagrams/renders/architecture.gif" alt="LiveDocs architecture: the Lexical editor in the browser syncs live edits, cursors and comments with Liveblocks over a WebSocket. It gets a room token from the Next.js auth route and calls server actions to rename, share, delete and save versions. Both verify the session with Clerk; the auth route identifies the user to Liveblocks and server actions use the Liveblocks REST API." width="100%" />
+  </a>
+  <br />
+  <sub>Click the diagram to see it full size.</sub>
+</p>
 
 - **Each document is a Liveblocks room.** The room holds the Yjs document, comments, and versions. Its metadata holds the title and owner, and its access lists hold who can view or edit. There's no separate database.
 - **The editor syncs directly with Liveblocks** over a WebSocket. The Next.js server is only involved to issue a room token and to perform privileged actions.
