@@ -25,7 +25,13 @@
 
 <br />
 
-![The LiveDocs editor with a second collaborator's live cursor, a comment thread, and the document outline](docs/images/editor.png)
+<p align="center">
+  <a href="https://github.com/Troy2727/coedit_flow/blob/main/docs/images/editor.png" title="Open this image full size">
+    <img src="docs/images/editor.png" alt="The LiveDocs editor with a second collaborator's live cursor, a comment thread, and the document outline" width="100%" />
+  </a>
+  <br />
+  <sub>Click the image to see it full size.</sub>
+</p>
 
 ---
 
@@ -91,23 +97,45 @@
 
 **Sharing: invite by email, choose a role, or share by link**
 
-![Share dialog with an invited editor and "Anyone with the link can view" access](docs/images/sharing.png)
+<p align="center">
+  <a href="https://github.com/Troy2727/coedit_flow/blob/main/docs/images/sharing.png" title="Open this image full size">
+    <img src="docs/images/sharing.png" alt="Share dialog with an invited editor and &quot;Anyone with the link can view&quot; access" width="100%" />
+  </a>
+  <br />
+  <sub>Click the image to see it full size.</sub>
+</p>
 
 **Version history: preview any saved version and restore it**
 
-![Version history panel showing a saved version and its preview](docs/images/version-history.png)
+<p align="center">
+  <a href="https://github.com/Troy2727/coedit_flow/blob/main/docs/images/version-history.png" title="Open this image full size">
+    <img src="docs/images/version-history.png" alt="Version history panel showing a saved version and its preview" width="100%" />
+  </a>
+  <br />
+  <sub>Click the image to see it full size.</sub>
+</p>
 
 **Home: all documents, searchable and sorted by last opened**
 
-![Documents home page with a search box and a list of documents](docs/images/home.png)
+<p align="center">
+  <a href="https://github.com/Troy2727/coedit_flow/blob/main/docs/images/home.png" title="Open this image full size">
+    <img src="docs/images/home.png" alt="Documents home page with a search box and a list of documents" width="100%" />
+  </a>
+  <br />
+  <sub>Click the image to see it full size.</sub>
+</p>
 
 ---
 
 ## 🏗️ Architecture
 
-![LiveDocs architecture: the Lexical editor in the browser syncs document updates, cursors and comments with Liveblocks over a WebSocket; it gets a room token from the auth route and calls server actions to rename, share, delete and save versions; both verify the session with Clerk and talk to Liveblocks.](docs/diagrams/renders/architecture.gif "Click to see full size")
-
-<p align="center"><sub>Click the diagram to see it full size.</sub></p>
+<p align="center">
+  <a href="https://github.com/Troy2727/coedit_flow/blob/main/docs/diagrams/renders/architecture.gif" title="Open this diagram full size">
+    <img src="docs/diagrams/renders/architecture.gif" alt="LiveDocs architecture: the Lexical editor in the browser syncs document updates, cursors and comments with Liveblocks over a WebSocket; it gets a room token from the auth route and calls server actions to rename, share, delete and save versions; both verify the session with Clerk and talk to Liveblocks." width="100%" />
+  </a>
+  <br />
+  <sub>Click the diagram to see it full size.</sub>
+</p>
 
 <details>
 <summary>Editable Mermaid version</summary>
