@@ -13,7 +13,7 @@
     <a href="https://nextjs.org"><img alt="Next.js 14" src="https://img.shields.io/badge/Next.js%2014-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" /></a>
     <a href="https://react.dev"><img alt="React 18" src="https://img.shields.io/badge/React%2018-61DAFB?style=for-the-badge&logo=react&logoColor=black" /></a>
     <a href="https://www.typescriptlang.org"><img alt="TypeScript 5.5" src="https://img.shields.io/badge/TypeScript%205.5-3178C6?style=for-the-badge&logo=typescript&logoColor=white" /></a>
-    <a href="https://lexical.dev"><img alt="Lexical" src="https://img.shields.io/badge/Lexical-76B6FF?style=for-the-badge" /></a>
+    <a href="https://lexical.dev"><img alt="Lexical" src="https://img.shields.io/badge/Lexical-050505?style=for-the-badge&logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMjAgMTEwIDExNSI+PHBhdGggZmlsbD0iIzc2QjZGRiIgZD0iTTIwIDU3aDIydjEwSDIwVjU3WiIvPjxwYXRoIGQ9Ik00NyA1N2gyMnYxMEg0N1Y1N1oiIGZpbGw9IiNGRkZGRkYiLz48cGF0aCBkPSJNNzQgNTdoOXYxMGgtOVY1N1pNMjAgNzNoMzZ2MTBIMjBWNzNaTTYxIDczaDIydjEwSDYxVjczWiIgZmlsbD0iIzc2QjZGRiIvPjxwYXRoIGQ9Ik0yMCA4OWgyMnYxMEgyMFY4OVoiIGZpbGw9IiNGRkZGRkYiLz48cGF0aCBkPSJNNDcgODloMjJ2MTBINDdWODlaIiBmaWxsPSIjNzZCNkZGIi8+PHBhdGggZD0iTTc0IDg5aDl2MTBoLTlWODlaIiBmaWxsPSIjRkZGRkZGIi8+PHBhdGggZD0iTTAgMzdoODN2MTBIMTB2NjJoNzN2MTBIMFYzN1pNMTE4IDM3aC0xNXYxMGg1djYyaC01djEwaDE1VjM3WiIgZmlsbD0iI0ZGRkZGRiIvPjxwYXRoIGQ9Ik03OCAzMlYyMmgzMXYxMEg5OHY5MmgxMXYxMEg3OHYtMTBoMTBWMzJINzhaIiBmaWxsPSIjRkZGRkZGIi8+PC9zdmc+" /></a>
     <a href="https://liveblocks.io"><img alt="Liveblocks" src="https://img.shields.io/badge/Liveblocks-000000?style=for-the-badge" /></a>
     <a href="https://yjs.dev"><img alt="Yjs" src="https://img.shields.io/badge/Yjs-555555?style=for-the-badge" /></a>
     <a href="https://clerk.com"><img alt="Clerk 5" src="https://img.shields.io/badge/Clerk%205-6C47FF?style=for-the-badge&logo=clerk&logoColor=white" /></a>
@@ -216,7 +216,7 @@ flowchart LR
 <a href="https://www.typescriptlang.org"><img alt="TypeScript 5.5" src="https://img.shields.io/badge/TypeScript%205.5-3178C6?style=for-the-badge&logo=typescript&logoColor=white" /></a>
 
 **Editor & real-time**<br/>
-<a href="https://lexical.dev"><img alt="Lexical" src="https://img.shields.io/badge/Lexical-76B6FF?style=for-the-badge" /></a>
+<a href="https://lexical.dev"><img alt="Lexical" src="https://img.shields.io/badge/Lexical-050505?style=for-the-badge&logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMjAgMTEwIDExNSI+PHBhdGggZmlsbD0iIzc2QjZGRiIgZD0iTTIwIDU3aDIydjEwSDIwVjU3WiIvPjxwYXRoIGQ9Ik00NyA1N2gyMnYxMEg0N1Y1N1oiIGZpbGw9IiNGRkZGRkYiLz48cGF0aCBkPSJNNzQgNTdoOXYxMGgtOVY1N1pNMjAgNzNoMzZ2MTBIMjBWNzNaTTYxIDczaDIydjEwSDYxVjczWiIgZmlsbD0iIzc2QjZGRiIvPjxwYXRoIGQ9Ik0yMCA4OWgyMnYxMEgyMFY4OVoiIGZpbGw9IiNGRkZGRkYiLz48cGF0aCBkPSJNNDcgODloMjJ2MTBINDdWODlaIiBmaWxsPSIjNzZCNkZGIi8+PHBhdGggZD0iTTc0IDg5aDl2MTBoLTlWODlaIiBmaWxsPSIjRkZGRkZGIi8+PHBhdGggZD0iTTAgMzdoODN2MTBIMTB2NjJoNzN2MTBIMFYzN1pNMTE4IDM3aC0xNXYxMGg1djYyaC01djEwaDE1VjM3WiIgZmlsbD0iI0ZGRkZGRiIvPjxwYXRoIGQ9Ik03OCAzMlYyMmgzMXYxMEg5OHY5MmgxMXYxMEg3OHYtMTBoMTBWMzJINzhaIiBmaWxsPSIjRkZGRkZGIi8+PC9zdmc+" /></a>
 <a href="https://liveblocks.io"><img alt="Liveblocks" src="https://img.shields.io/badge/Liveblocks-000000?style=for-the-badge" /></a>
 <a href="https://yjs.dev"><img alt="Yjs" src="https://img.shields.io/badge/Yjs-555555?style=for-the-badge" /></a>
 
