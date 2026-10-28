@@ -10,13 +10,22 @@
     <a href="https://github.com/Troy2727/coedit_flow/actions/workflows/ci.yml"><img src="https://github.com/Troy2727/coedit_flow/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
   </p>
   <p>
-    <img src="https://img.shields.io/badge/-Next.js_14-black?style=for-the-badge&logoColor=white&logo=nextdotjs&color=000000" alt="Next.js" />
-    <img src="https://img.shields.io/badge/-TypeScript-black?style=for-the-badge&logoColor=white&logo=typescript&color=3178C6" alt="TypeScript" />
-    <img src="https://img.shields.io/badge/-Tailwind_CSS-black?style=for-the-badge&logoColor=white&logo=tailwindcss&color=06B6D4" alt="Tailwind CSS" />
-    <img src="https://img.shields.io/badge/-Liveblocks-black?style=for-the-badge&logoColor=white&color=6C47FF" alt="Liveblocks" />
-    <img src="https://img.shields.io/badge/-Lexical-black?style=for-the-badge&logoColor=white&color=2F80ED" alt="Lexical" />
-    <img src="https://img.shields.io/badge/-Clerk-black?style=for-the-badge&logoColor=white&logo=clerk&color=6C47FF" alt="Clerk" />
-    <img src="https://img.shields.io/badge/-Playwright-black?style=for-the-badge&logoColor=white&logo=playwright&color=2EAD33" alt="Playwright" />
+    <a href="https://nextjs.org"><img alt="Next.js 14" src="https://img.shields.io/badge/Next.js%2014-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" /></a>
+    <a href="https://react.dev"><img alt="React 18" src="https://img.shields.io/badge/React%2018-61DAFB?style=for-the-badge&logo=react&logoColor=black" /></a>
+    <a href="https://www.typescriptlang.org"><img alt="TypeScript 5.5" src="https://img.shields.io/badge/TypeScript%205.5-3178C6?style=for-the-badge&logo=typescript&logoColor=white" /></a>
+    <a href="https://lexical.dev"><img alt="Lexical" src="https://img.shields.io/badge/Lexical-76B6FF?style=for-the-badge" /></a>
+    <a href="https://liveblocks.io"><img alt="Liveblocks" src="https://img.shields.io/badge/Liveblocks-000000?style=for-the-badge" /></a>
+    <a href="https://yjs.dev"><img alt="Yjs" src="https://img.shields.io/badge/Yjs-555555?style=for-the-badge" /></a>
+    <a href="https://clerk.com"><img alt="Clerk 5" src="https://img.shields.io/badge/Clerk%205-6C47FF?style=for-the-badge&logo=clerk&logoColor=white" /></a>
+    <a href="https://tailwindcss.com"><img alt="Tailwind CSS 3" src="https://img.shields.io/badge/Tailwind%20CSS%203-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" /></a>
+    <a href="https://ui.shadcn.com"><img alt="shadcn/ui" src="https://img.shields.io/badge/shadcn%2Fui-000000?style=for-the-badge&logo=shadcnui&logoColor=white" /></a>
+    <a href="https://www.radix-ui.com"><img alt="Radix UI" src="https://img.shields.io/badge/Radix%20UI-161618?style=for-the-badge&logo=radixui&logoColor=white" /></a>
+    <a href="https://motion.dev"><img alt="Framer Motion" src="https://img.shields.io/badge/Framer%20Motion-0055FF?style=for-the-badge&logo=framer&logoColor=white" /></a>
+    <a href="https://lucide.dev"><img alt="Lucide" src="https://img.shields.io/badge/Lucide-F56565?style=for-the-badge&logo=lucide&logoColor=white" /></a>
+    <a href="https://playwright.dev"><img alt="Playwright" src="https://img.shields.io/badge/Playwright-2EAD33?style=for-the-badge" /></a>
+    <a href="https://eslint.org"><img alt="ESLint 8" src="https://img.shields.io/badge/ESLint%208-4B32C3?style=for-the-badge&logo=eslint&logoColor=white" /></a>
+    <a href="https://github.com/features/actions"><img alt="GitHub Actions" src="https://img.shields.io/badge/GitHub%20Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white" /></a>
+    <a href="https://vercel.com"><img alt="Vercel" src="https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" /></a>
   </p>
   <h1>LiveDocs</h1>
   <p><b>A real-time collaborative document editor, inspired by Google Docs.</b></p>
@@ -39,7 +48,7 @@
 
 ---
 
-## 📋 Table of Contents
+## <img src="docs/icons/list-ordered.svg" width="24" height="24" alt="" /> Table of Contents
 
 1. [Features](#-features)
 2. [Screenshots](#-screenshots)
@@ -54,7 +63,7 @@
 
 ---
 
-## ✨ Features
+## <img src="docs/icons/sparkles.svg" width="24" height="24" alt="" /> Features
 
 **👥 Real-time collaboration**
 - Multiple people edit the same document simultaneously; changes merge without conflicts (CRDT)
@@ -97,7 +106,7 @@
 
 ---
 
-## 🖼️ Screenshots
+## <img src="docs/icons/image.svg" width="24" height="24" alt="" /> Screenshots
 
 **Sharing: invite by email, choose a role, or share by link**
 
@@ -141,7 +150,7 @@
 
 ---
 
-## 🏗️ Architecture
+## <img src="docs/icons/network.svg" width="24" height="24" alt="" /> Architecture
 
 <p align="center">
   <a href="https://github.com/Troy2727/coedit_flow/blob/main/docs/diagrams/renders/architecture.gif" title="Open this diagram full size">
@@ -185,7 +194,7 @@ flowchart LR
 
 ---
 
-## 🔍 Engineering Highlights
+## <img src="docs/icons/search.svg" width="24" height="24" alt="" /> Engineering Highlights
 
 - **Conflict-free real-time editing with CRDTs.** Documents are Yjs CRDTs bound to Lexical. When two people type in the same place, edits merge deterministically on every client, with no locking and no "last write wins".
 - **Authorization on the server, not just in the UI.** Next.js server actions are public HTTP endpoints, so hiding a button isn't security. Every action re-verifies the Clerk session and checks the caller's role on that room before touching data: editors can rename and share, only owners can delete, and nobody can change the owner's access. Liveblocks separately enforces room permissions on the real-time connection.
@@ -199,7 +208,33 @@ flowchart LR
 
 ---
 
-## ⚙️ Tech Stack
+## <img src="docs/icons/layers.svg" width="24" height="24" alt="" /> Tech Stack
+
+**Framework**<br/>
+<a href="https://nextjs.org"><img alt="Next.js 14" src="https://img.shields.io/badge/Next.js%2014-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" /></a>
+<a href="https://react.dev"><img alt="React 18" src="https://img.shields.io/badge/React%2018-61DAFB?style=for-the-badge&logo=react&logoColor=black" /></a>
+<a href="https://www.typescriptlang.org"><img alt="TypeScript 5.5" src="https://img.shields.io/badge/TypeScript%205.5-3178C6?style=for-the-badge&logo=typescript&logoColor=white" /></a>
+
+**Editor & real-time**<br/>
+<a href="https://lexical.dev"><img alt="Lexical" src="https://img.shields.io/badge/Lexical-76B6FF?style=for-the-badge" /></a>
+<a href="https://liveblocks.io"><img alt="Liveblocks" src="https://img.shields.io/badge/Liveblocks-000000?style=for-the-badge" /></a>
+<a href="https://yjs.dev"><img alt="Yjs" src="https://img.shields.io/badge/Yjs-555555?style=for-the-badge" /></a>
+
+**Auth**<br/>
+<a href="https://clerk.com"><img alt="Clerk 5" src="https://img.shields.io/badge/Clerk%205-6C47FF?style=for-the-badge&logo=clerk&logoColor=white" /></a>
+
+**UI**<br/>
+<a href="https://tailwindcss.com"><img alt="Tailwind CSS 3" src="https://img.shields.io/badge/Tailwind%20CSS%203-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" /></a>
+<a href="https://ui.shadcn.com"><img alt="shadcn/ui" src="https://img.shields.io/badge/shadcn%2Fui-000000?style=for-the-badge&logo=shadcnui&logoColor=white" /></a>
+<a href="https://www.radix-ui.com"><img alt="Radix UI" src="https://img.shields.io/badge/Radix%20UI-161618?style=for-the-badge&logo=radixui&logoColor=white" /></a>
+<a href="https://motion.dev"><img alt="Framer Motion" src="https://img.shields.io/badge/Framer%20Motion-0055FF?style=for-the-badge&logo=framer&logoColor=white" /></a>
+<a href="https://lucide.dev"><img alt="Lucide" src="https://img.shields.io/badge/Lucide-F56565?style=for-the-badge&logo=lucide&logoColor=white" /></a>
+
+**Testing & deploy**<br/>
+<a href="https://playwright.dev"><img alt="Playwright" src="https://img.shields.io/badge/Playwright-2EAD33?style=for-the-badge" /></a>
+<a href="https://eslint.org"><img alt="ESLint 8" src="https://img.shields.io/badge/ESLint%208-4B32C3?style=for-the-badge&logo=eslint&logoColor=white" /></a>
+<a href="https://github.com/features/actions"><img alt="GitHub Actions" src="https://img.shields.io/badge/GitHub%20Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white" /></a>
+<a href="https://vercel.com"><img alt="Vercel" src="https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" /></a>
 
 | Layer | Technology |
 |---|---|
@@ -212,7 +247,7 @@ flowchart LR
 
 ---
 
-## 🚀 Getting Started
+## <img src="docs/icons/rocket.svg" width="24" height="24" alt="" /> Getting Started
 
 **Prerequisites:** [Node.js](https://nodejs.org) 18+, plus free [Clerk](https://clerk.com) and [Liveblocks](https://liveblocks.io) accounts.
 
@@ -243,7 +278,7 @@ Open [http://localhost:3001](http://localhost:3001).
 
 ---
 
-## 🧪 Testing
+## <img src="docs/icons/flask-conical.svg" width="24" height="24" alt="" /> Testing
 
 ```bash
 npx playwright install chromium   # first time only
@@ -258,7 +293,7 @@ To regenerate the screenshots in this README: `npm run screenshots`.
 
 ---
 
-## 📁 Project Structure
+## <img src="docs/icons/folder-tree.svg" width="24" height="24" alt="" /> Project Structure
 
 ```
 app/
@@ -275,7 +310,7 @@ e2e/                              Playwright end-to-end tests
 
 ---
 
-## 🗺️ Roadmap
+## <img src="docs/icons/map.svg" width="24" height="24" alt="" /> Roadmap
 
 - Suggesting mode: typing itself becomes suggestions (building on the existing suggest-edit nodes and accept/reject)
 - AI writing assistant (improve, summarize, translate a selection)
@@ -283,7 +318,7 @@ e2e/                              Playwright end-to-end tests
 
 ---
 
-## 👨‍💻 Author
+## <img src="docs/icons/user.svg" width="24" height="24" alt="" /> Author
 
 **Alex Mieses** · [GitHub](https://github.com/Troy2727)
 
@@ -291,6 +326,6 @@ Alex built LiveDocs as a complete product, not just an editor demo: real-time co
 
 ---
 
-## 📄 License
+## <img src="docs/icons/scale.svg" width="24" height="24" alt="" /> License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
