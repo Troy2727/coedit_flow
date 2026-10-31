@@ -33,6 +33,14 @@
       }
       .title .blue {
         color: #3371ff;
+        display: flex;
+        align-items: center;
+        gap: 28px;
+      }
+      .title .blue svg {
+        width: 100px;
+        height: 100px;
+        flex: none;
       }
       .banner-shot {
         position: absolute;
@@ -57,7 +65,21 @@
   </head>
   <body>
     <div id="banner" class="scene" data-composition-id="main" data-start="0" data-duration="7" data-width="1600" data-height="462">
-      <div class="title"><div class="blue">LiveDocs</div><div>Application</div></div>
+      <div class="title">
+        <div class="blue">
+          <!-- public/assets/icons/livedocs-icon.svg -->
+          <svg viewBox="0 0 48 48" aria-hidden="true">
+            <rect width="48" height="48" rx="12" fill="#3371FF" />
+            <rect x="11" y="10" width="5.5" height="28" rx="2.75" fill="#fff" />
+            <rect x="11" y="32.5" width="26" height="5.5" rx="2.75" fill="#fff" />
+            <rect x="21" y="11" width="16" height="4" rx="2" fill="#A9C1FF" />
+            <rect x="21" y="19.5" width="9" height="4" rx="2" fill="#A9C1FF" />
+            <rect x="32.5" y="16.5" width="3" height="10" rx="1.5" fill="#FFB547" />
+          </svg>
+          LiveDocs
+        </div>
+        <div>Application</div>
+      </div>
       <div class="banner-shot">
         <img src="../images/editor.png" alt="The LiveDocs editor" />
         <svg viewBox="0 0 1600 1000">

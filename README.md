@@ -1,4 +1,11 @@
 <div align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/livedocs-lockup-dark.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="docs/images/livedocs-lockup-light.svg" />
+    <img src="docs/images/livedocs-lockup-light.svg" alt="LiveDocs, collaborative editor" width="360" />
+  </picture>
+  <br />
+  <br />
   <a href="https://github.com/Troy2727/coedit_flow/blob/main/docs/diagrams/renders/banner.gif" title="Open this image full size">
     <img src="docs/diagrams/renders/banner.gif" alt="LiveDocs banner" width="100%" />
   </a>
