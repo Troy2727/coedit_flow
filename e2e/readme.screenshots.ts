@@ -149,7 +149,7 @@ test('capture README screenshots', async ({ page, browser }) => {
   await page.goto('/');
   await expect(page.getByText('Q4 Product Launch Plan')).toBeVisible();
   // Wait for the header logo and avatar images so they're in the shot
-  await expect(page.getByAltText('Logo with name')).toBeVisible();
+  await expect(page.getByRole('link', { name: 'LiveDocs home' }).locator('img').first()).toBeVisible();
   await page.waitForLoadState('networkidle');
   await page.screenshot({ path: `${OUT}/home.png` });
 });
